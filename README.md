@@ -1,2 +1,3 @@
 # numru
-The fundamental package for scientific computing with Rust.
+
+A high-performance scientific computation library written in Rust.
