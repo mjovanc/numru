@@ -10,25 +10,7 @@ repository = "https://github.com/kur08/numru"
 readme = "README.md"
 rust-version = "1.83.0"
 homepage = "https://github.com/kur08/numru"
-keywords = [
-    "scientific",
-    "computation",
-    "numerical",
-    "math",
-    "tensor",
-    "array",
-    "matrix",
-    "linear-algebra",
-    "statistics",
-    "data-science",
-    "machine-learning",
-    "physics",
-    "simulation",
-    "engineering",
-    "finance",
-    "bioinformatics",
-    "numpy",
-]
+keywords = ["scientific", "computation", "numerical", "math", "array"]
 
 [badges]
 maintenance = { status = "actively-developed" }
