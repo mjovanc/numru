@@ -1,5 +1,5 @@
 # numru
 
-[![ci](https://github.com/kur08/numru/workflows/ci/badge.svg)](https://github.com/kur08/numru/actions?query=workflow%3Aci)
+![ci](https://img.shields.io/github/actions/workflow/status/kur08/numru/ci)
 
 A high-performance scientific computation library written in Rust.
