@@ -1,7 +1,8 @@
 name: release
 
 on:
-  workflow_call:
+  release:
+    types: [published]
 
 jobs:
   build:
