@@ -6,6 +6,25 @@
 
 A high-performance scientific computation library written in Rust.
 
+## Get Started
+
+This getting started guide might change and should not be a source of absolute truth. Check the unit tests if you want to stay up to date with how things should be done. Some APIs will definetely be changed in the future.
+
+```toml
+[dependencies]
+numru = "0.1.0"
+```
+
+And a simple code:
+
+```rust
+fn main() {
+  let mut a = array![1, 2, 3];
+  a.zeros();
+  println!("{:?}", a);
+}
+```
+
 ## Features
 
 Numru will offer a variety of different numerical operations and data types. It is intended to be a fundamental library for scientific computing with Rust.
