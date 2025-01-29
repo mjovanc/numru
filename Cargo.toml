@@ -16,3 +16,7 @@ keywords = ["scientific", "computation", "numerical", "math", "array"]
 maintenance = { status = "actively-developed" }
 
 [dependencies]
+
+[[example]]
+name = "example"
+path = "examples/example.rs"
