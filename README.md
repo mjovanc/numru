@@ -8,6 +8,8 @@ A high-performance scientific computation library written in Rust.
 
 ## Features
 
+Numru will offer a variety of different numerical operations and data types. It is intended to be a fundamental library for scientific computing with Rust.
+
 ### Supported Data Types
 
 - i64
@@ -36,3 +38,7 @@ A high-performance scientific computation library written in Rust.
 | Element-wise Div   | `a / b`                             | 🚧                          |
 | Fancy indexing     | `np.ones((2,3))[0, :]`             | 🚧         |
 | Fancy flipping     | `np.array([1,2,3])[::-1]`          | 🚧      |
+
+## License
+
+The MIT License.
