@@ -48,7 +48,7 @@ Note that currently we only show the numru equivalents as the ones that are plan
 
 | Operation            | NumPy Equivalent                     | Numru Equivalent              |
 |----------------------|-------------------------------------|----------------------------------|
-| Create Array         | `np.array([1, 2, 3])` or `np.array([[1,2,3], [1,2,3]])`                 | `array![1, 2, 3]` or `array![[1,2,3], [1,2,3]]`             |
+| Create Array         | `np.array([1, 2, 3])` or `np.array([ [1,2,3], [1,2,3], [[4,5,6], [4,5,6]] ])`                 | `array![1, 2, 3]` or `array![ [[1,2,3], [1,2,3]], [[4,5,6], [4,5,6]] ]`             |
 | Zeros Array         | `np.zeros((3, 3, 3))`                  | `zeros!(3, 3, 3)` or `a.zeros()`             |
 | Ones Array          | `np.ones((3, 3, 3))`                   | `ones!(3, 3, 3)` or `a.ones()`              |
 | Arange             | `np.arange(start, stop, step)`      | `arange!(start, stop, step)` |
