@@ -48,9 +48,9 @@ Note that currently we only show the numru equivalents as the ones that are plan
 
 | Operation            | NumPy Equivalent                     | Numru Equivalent              |
 |----------------------|-------------------------------------|----------------------------------|
-| Create Array         | `np.array([1, 2, 3])`                  | `array![1, 2, 3]`              |
-| Zeros Array         | `np.zeros((3, 3))`                  | `zeros!(3, 3)` or `a.zeros()`             |
-| Ones Array          | `np.ones((3, 3))`                   | `ones!(3, 3)` or `a.ones()`              |
+| Create Array         | `np.array([1, 2, 3])` or `np.array([[1,2,3], [1,2,3]])`                 | `array![1, 2, 3]` or `array![[1,2,3], [1,2,3]]`             |
+| Zeros Array         | `np.zeros((3, 3, 3))`                  | `zeros!(3, 3, 3)` or `a.zeros()`             |
+| Ones Array          | `np.ones((3, 3, 3))`                   | `ones!(3, 3, 3)` or `a.ones()`              |
 | Arange             | `np.arange(start, stop, step)`      | `arange!(start, stop, step)` |
 | Linspace           | `np.linspace(start, stop, num)`     | 🚧 |
 | Mean               | `np.mean(a)`                        | `a.mean()`                  |
@@ -60,14 +60,14 @@ Note that currently we only show the numru equivalents as the ones that are plan
 | Log                | `np.log(a)`                         | 🚧                    |
 | Sigmoid            | `1 / (1 + np.exp(-a))`              | 🚧                |
 | Dot Product        | `np.dot(a, b)`                      | `dot!(a, b)`                 |
-| Reshape           | `a.reshape((4, 3))`                 | `a.reshape(4, 3)`             |
-| Concatenate        | `np.concatenate([a,b], axis=0)`     | 🚧 |
+| Reshape           | `a.reshape((4, 3, 3))`                 | `a.reshape(4, 3, 3)`             |
+| Concatenate        | `np.concatenate([a, b], axis=0)`     | 🚧 |
 | Element-wise Add   | `a + b`                             | `a + b`                          |
 | Element-wise Sub   | `a - b`                             | `a - b`                         |
 | Element-wise Mul   | `a * b`                             | `a * b`                          |
 | Element-wise Div   | `a / b`                             | `a / b`                         |
-| Fancy Indexing     | `np.ones((2,3))[0, :]`             | 🚧         |
-| Fancy Flipping     | `np.array([1,2,3])[::-1]`          | 🚧      |
+| Fancy Indexing     | `np.ones((3, 3, 3))[0, :]`             | 🚧         |
+| Fancy Flipping     | `np.array([1, 2, 3])[::-1]`          | 🚧      |
 
 ## License
 
