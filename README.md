@@ -1,6 +1,6 @@
 # numru
 
-![ci](https://img.shields.io/github/actions/workflow/status/kur08/numru/ci.yml?branch=main)
+![ci](https://img.shields.io/github/actions/workflow/status/mjovanc/numru/ci.yml?branch=main)
 ![crates.io](https://img.shields.io/crates/v/numru.svg)
 [![documentation](https://img.shields.io/badge/docs-numru-blue?logo=rust)](https://docs.rs/numru/latest/)
 
@@ -34,30 +34,32 @@ Numru will offer a variety of different numerical operations and data types. It 
 - i64
 - f64
 
-### Supported Operations
+### Supported Operations (planned)
+
+Note that currently we only show the numru equivalents as the ones that are planned. They do not exist yet.
 
 | Operation            | NumPy Equivalent                     | Numru Equivalent              |
 |----------------------|-------------------------------------|----------------------------------|
-| Create Array         | `np.array([2, 3])`                  | `array!([2, 3])`              |
-| Zeros Array         | `np.zeros((2, 3))`                  | `zeros!([2, 3])` or `a.zeros()`             |
-| Ones Array          | `np.ones((2, 3))`                   | `ones!([2, 3])` or `a.ones()`              |
-| Arange             | `np.arange(start, stop, step)`      | 🚧 |
+| Create Array         | `np.array([2, 3])`                  | `array![1, 2, 3]`              |
+| Zeros Array         | `np.zeros((2, 3))`                  | `zeros!(3, 3)` or `a.zeros()`             |
+| Ones Array          | `np.ones((2, 3))`                   | `ones!(3, 3)` or `a.ones()`              |
+| Arange             | `np.arange(start, stop, step)`      | `arange!(start, stop, step)` |
 | Linspace           | `np.linspace(start, stop, num)`     | 🚧 |
-| Mean               | `np.mean(a)`                        | 🚧                  |
-| Min                | `np.min(a)`                         | 🚧                    |
-| Max                | `np.max(a)`                         | 🚧                    |
+| Mean               | `np.mean(a)`                        | `a.mean()`                  |
+| Min                | `np.min(a)`                         | `a.min()`                    |
+| Max                | `np.max(a)`                         | `a.max()`                    |
 | Exp                | `np.exp(a)`                         | 🚧                    |
 | Log                | `np.log(a)`                         | 🚧                    |
 | Sigmoid            | `1 / (1 + np.exp(-a))`              | 🚧                |
-| Dot Product        | `np.dot(a, b)`                      | 🚧                 |
-| Reshape           | `a.reshape((2, 3))`                 | 🚧             |
+| Dot Product        | `np.dot(a, b)`                      | `dot!(a, b)`                 |
+| Reshape           | `a.reshape((2, 3))`                 | `a.reshape(4, 3)`             |
 | Concatenate        | `np.concatenate([a,b], axis=0)`     | 🚧 |
-| Element-wise Add   | `a + b`                             | 🚧                          |
-| Element-wise Sub   | `a - b`                             | 🚧                          |
-| Element-wise Mul   | `a * b`                             | 🚧                          |
-| Element-wise Div   | `a / b`                             | 🚧                          |
-| Fancy indexing     | `np.ones((2,3))[0, :]`             | 🚧         |
-| Fancy flipping     | `np.array([1,2,3])[::-1]`          | 🚧      |
+| Element-wise Add   | `a + b`                             | `a + b`                          |
+| Element-wise Sub   | `a - b`                             | `a - b`                         |
+| Element-wise Mul   | `a * b`                             | `a * b`                          |
+| Element-wise Div   | `a / b`                             | `a / b`                         |
+| Fancy Indexing     | `np.ones((2,3))[0, :]`             | 🚧         |
+| Fancy Flipping     | `np.array([1,2,3])[::-1]`          | 🚧      |
 
 ## License
 
