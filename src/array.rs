@@ -1,12 +1,3 @@
-pub trait Numeric {
-    fn zeros(len: usize) -> Vec<Self>
-    where
-        Self: Sized;
-    fn ones(len: usize) -> Vec<Self>
-    where
-        Self: Sized;
-}
-
 #[derive(Debug)]
 pub struct Array<T> {
     data: Vec<T>,
