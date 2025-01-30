@@ -19,9 +19,14 @@ And a simple code:
 
 ```rust
 fn main() {
-  let mut a = array![1, 2, 3];
-  a.zeros();
+  let a = array![1, 2, 3];
   println!("{:?}", a);
+
+  let b = array![
+    [ [1,1,1], [2,2,2] ],
+    [ [3,3,3], [4,4,4] ]
+  ];
+  println("{:?}", b);
 }
 ```
 
