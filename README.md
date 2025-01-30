@@ -38,8 +38,9 @@ Numru will offer a variety of different numerical operations and data types. It 
 
 | Operation            | NumPy Equivalent                     | Numru Equivalent              |
 |----------------------|-------------------------------------|----------------------------------|
-| Zeros Array         | `np.zeros((2, 3))`                  | 🚧             |
-| Ones Array          | `np.ones((2, 3))`                   | 🚧              |
+| Create Array         | `np.array([2, 3])`                  | `array!([2, 3])`              |
+| Zeros Array         | `np.zeros((2, 3))`                  | `zeros!([2, 3])` or `a.zeros()`             |
+| Ones Array          | `np.ones((2, 3))`                   | `ones!([2, 3])` or `a.ones()`              |
 | Arange             | `np.arange(start, stop, step)`      | 🚧 |
 | Linspace           | `np.linspace(start, stop, num)`     | 🚧 |
 | Mean               | `np.mean(a)`                        | 🚧                  |
