@@ -34,6 +34,14 @@ Numru will offer a variety of different numerical operations and data types. It 
 - i64
 - f64
 
+### Planned Data Types (Future)
+
+- i8, i16, i32, i128
+- u8, u16, u32, u64, u128
+- f32
+- bool
+- String, &str
+
 ### Supported Operations (planned)
 
 Note that currently we only show the numru equivalents as the ones that are planned. They do not exist yet.

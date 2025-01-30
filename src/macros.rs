@@ -1,9 +1,9 @@
 #[macro_export]
 macro_rules! array {
     () => {
-        crate::nr::Array::new(Vec::new())
+        crate::array::Array::new(Vec::new())
     };
     ($($elem:expr),*) => {
-        crate::nr::Array::new(vec![$($elem),*])
+        crate::array::Array::new(vec![$($elem),*])
     };
 }
