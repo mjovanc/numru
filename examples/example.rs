@@ -1,12 +1,13 @@
 use numru::array;
+use std::f64::consts::{PI, TAU, E};
 
 fn main() {
     let a = array![42, -17, 256, 3, 99, -8];
     println!("{:?}", a);
 
     let b = array![
-        [6.28, -3.14, 1.61],
-        [2.71,  0.98, -7.42],
+        [TAU, -PI, 1.61],
+        [E,  0.98, -7.42],
         [4.67, -0.45, 8.88],
     ];
     println!("{:?}", b);
