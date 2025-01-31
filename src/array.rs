@@ -1,15 +1,28 @@
+use crate::Shape;
+use crate::shape::IxDyn;
+
 #[derive(Debug)]
 pub struct Array<T> {
     data: Vec<T>,
+    shape: Option<Shape<IxDyn>>,
 }
 
 impl<T> Array<T> {
     pub fn new(data: Vec<T>) -> Self {
-        Array { data }
+        Array { data, shape: None }
     }
 
     pub fn data(&self) -> &Vec<T> {
         &self.data
+    }
+
+    pub fn with_shape(mut self, shape: Shape<IxDyn>) -> Self {
+        self.shape = Some(shape);
+        self
+    }
+
+    pub fn shape(&self) -> Option<&Shape<IxDyn>> {
+        self.shape.as_ref()
     }
 }
 
@@ -52,6 +65,9 @@ mod tests {
     #[test]
     fn test_array_creation_empty() {
         let a: Array<i64> = array![];
+        assert!(a.data().is_empty());
+
+        let a: Array<f64> = array![];
         assert!(a.data().is_empty());
     }
 }

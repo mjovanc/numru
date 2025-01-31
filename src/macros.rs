@@ -1,26 +1,20 @@
 #[macro_export]
 macro_rules! array {
-    ($($elem:expr),*) => {
-        crate::array::Array::new(vec![$($elem),*])
-    };
-
-    ([ $($row:expr),* ]) => {{
-        let mut rows = Vec::new();
-        $(
-            rows.push(vec![$($row),*]);
-        )*
-        crate::array::Array::new(rows)
+    ($($elem:expr),* $(,)?) => {{
+        let data = vec![$($elem),*];
+        let shape = $crate::Shape::new($crate::shape::IxDyn::new(vec![data.len()]));
+        crate::array::Array::new(data).with_shape(shape)
     }};
 
-    ([[ $($row:expr),* ]]) => {{
-        let mut rows = Vec::new();
-        $(
-            let mut row_vec = Vec::new();
-            $(
-                row_vec.push(vec![$($row),*]);
-            )*
-            rows.push(row_vec);
-        )*
-        crate::array::Array::new(rows)
+    ([ $([$($elem:expr),* $(,)?]),* $(,)? ]) => {{
+        let data = vec![$(vec![$($elem),*]),*];
+        let shape = $crate::Shape::new($crate::shape::IxDyn::new(vec![data.len(), data[0].len()]));
+        crate::array::Array::new(data).with_shape(shape)
+    }};
+
+    ([ [ $([$($elem:expr),* $(,)?]),* $(,)? ] $(,)? ]) => {{
+        let data = vec![$(vec![$(vec![$($elem),*]),*]),*];
+        let shape = $crate::Shape::new($crate::shape::IxDyn::new(vec![data.len(), data[0].len(), data[0][0].len()]));
+        crate::array::Array::new(data).with_shape(shape)
     }};
 }
