@@ -6,9 +6,15 @@
 
 A high-performance scientific computation library written in Rust.
 
+## Motivation
+
+Numru is a scientific computation library that aims to provide a high-performance, easy-to-use, and flexible API for numerical operations. 
+It is inspired by NumPy, a popular numerical computation library in Python. Numru is designed to be a fundamental library for scientific computing with Rust.
+
 ## Get Started
 
-This getting started guide might change and should not be a source of absolute truth. Check the unit tests if you want to stay up to date with how things should be done. Some APIs will definetely be changed in the future.
+This getting started guide might change and should not be a source of absolute truth. 
+Check the unit tests if you want to stay up to date with how things should be done. Some APIs will definetely be changed in the future.
 
 ```toml
 [dependencies]
