@@ -1,5 +1,5 @@
-use crate::Shape;
 use crate::shape::IxDyn;
+use crate::Shape;
 
 #[derive(Debug)]
 pub struct Array<T> {
@@ -44,30 +44,30 @@ mod tests {
 
     #[test]
     fn test_array_creation() {
-        let a = array![1, 2, 3];
+        let a = arr![1, 2, 3];
         assert_eq!(a.data(), &vec![1, 2, 3]);
         assert_eq!(a.dtype(), "int64");
 
-        let f = array![1.0, 2.0, 3.0];
+        let f = arr![1.0, 2.0, 3.0];
         assert_eq!(f.data(), &vec![1.0, 2.0, 3.0]);
         assert_eq!(f.dtype(), "float64");
     }
 
     #[test]
     fn test_dtype_correctness() {
-        let a = array![1, 2, 3];
+        let a = arr![1, 2, 3];
         assert_eq!(a.dtype(), "int64");
 
-        let b = array![1.0, 2.0, 3.0];
+        let b = arr![1.0, 2.0, 3.0];
         assert_eq!(b.dtype(), "float64");
     }
 
     #[test]
     fn test_array_creation_empty() {
-        let a: Array<i64> = array![];
+        let a: Array<i64> = arr![];
         assert!(a.data().is_empty());
 
-        let a: Array<f64> = array![];
+        let a: Array<f64> = arr![];
         assert!(a.data().is_empty());
     }
 }

@@ -8,12 +8,12 @@ A high-performance scientific computation library written in Rust.
 
 ## Motivation
 
-Numru is a scientific computation library that aims to provide a high-performance, easy-to-use, and flexible API for numerical operations. 
+Numru is a scientific computation library that aims to provide a high-performance, easy-to-use, and flexible API for numerical operations.
 It is inspired by NumPy, a popular numerical computation library in Python. Numru is designed to be a fundamental library for scientific computing with Rust.
 
 ## Get Started
 
-This getting started guide might change and should not be a source of absolute truth. 
+This getting started guide might change and should not be a source of absolute truth.
 Check the unit tests if you want to stay up to date with how things should be done. Some APIs will definetely be changed in the future.
 
 ```toml
@@ -25,17 +25,17 @@ And a simple code:
 
 ```rust
 fn main() {
-    let a = array![42, -17, 256, 3, 99, -8];
+    let a = arr![42, -17, 256, 3, 99, -8];
     println!("{:?}", a);
 
-    let b = array![
+    let b = arr![
         [TAU, -PI, 1.61],
         [E,  0.98, -7.42],
         [4.67, -0.45, 8.88],
     ];
     println!("{:?}", b);
 
-    let c = array![
+    let c = arr![
         [[101, 202, 303], [404, 505, 606]],
         [[-707, -808, -909], [111, 222, 333]]
     ];
@@ -66,7 +66,7 @@ Note that currently we only show the numru equivalents as the ones that are plan
 
 | Operation            | NumPy Equivalent                     | Numru Equivalent              |
 |----------------------|-------------------------------------|----------------------------------|
-| Create Array         | `np.array([1, 2, 3])` or `np.array([ [1,2,3], [1,2,3], [[4,5,6], [4,5,6]] ])` | `array![1, 2, 3]` or `array![ [[1,2,3], [1,2,3]], [[4,5,6], [4,5,6]] ]`             |
+| Create Array         | `np.array([1, 2, 3])` or `np.array([ [1,2,3], [1,2,3], [[4,5,6], [4,5,6]] ])` | `arr![1, 2, 3]` or `arr![ [[1,2,3], [1,2,3]], [[4,5,6], [4,5,6]] ]`             |
 | Zeros Array         | `np.zeros((3, 3, 3))`                  | `zeros!(3, 3, 3)` or `a.zeros()`             |
 | Ones Array          | `np.ones((3, 3, 3))`                   | `ones!(3, 3, 3)` or `a.ones()`              |
 | Arange             | `np.arange(start, stop, step)`      | `arange!(start, stop, step)` |
