@@ -76,6 +76,7 @@ pub struct IxDyn {
 
 impl IxDyn {
     pub fn new(dims: Vec<usize>) -> Self {
+        println!("New IxDyn with dims={:?}", dims);
         IxDyn { dims }
     }
 }
