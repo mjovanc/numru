@@ -69,7 +69,7 @@ pub trait Dimension {
     fn size(&self) -> usize;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct IxDyn {
     dims: Vec<usize>,
 }
@@ -77,6 +77,12 @@ pub struct IxDyn {
 impl IxDyn {
     pub fn new(dims: Vec<usize>) -> Self {
         IxDyn { dims }
+    }
+}
+
+impl Debug for IxDyn {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "IxDyn {{ dims: {:?} }}", self.dims)
     }
 }
 
