@@ -4,25 +4,20 @@ use crate::Shape;
 #[derive(Debug)]
 pub struct Array<T> {
     data: Vec<T>,
-    shape: Option<Shape<IxDyn>>,
+    shape: Shape<IxDyn>, // TODO: we should have a generic Ix type here to allow for different index types
 }
 
 impl<T> Array<T> {
-    pub fn new(data: Vec<T>) -> Self {
-        Array { data, shape: None }
+    pub fn new(data: Vec<T>, shape: Shape<IxDyn>) -> Self {
+        Array { data, shape }
     }
 
     pub fn data(&self) -> &Vec<T> {
         &self.data
     }
 
-    pub fn with_shape(mut self, shape: Shape<IxDyn>) -> Self {
-        self.shape = Some(shape);
-        self
-    }
-
-    pub fn shape(&self) -> Option<&Shape<IxDyn>> {
-        self.shape.as_ref()
+    pub fn shape(&self) -> &Shape<IxDyn> {
+        &self.shape
     }
 }
 

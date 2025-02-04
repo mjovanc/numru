@@ -4,7 +4,7 @@ macro_rules! arr {
     ($($elem:expr),* $(,)?) => {{
         let data = vec![$($elem),*];
         let shape = $crate::Shape::new($crate::shape::IxDyn::new(vec![data.len()]));
-        $crate::array::Array::new(data).with_shape(shape)
+        $crate::array::Array::new(data, shape)
     }};
 
     // 2D array
@@ -14,7 +14,7 @@ macro_rules! arr {
         let cols = nested[0].len();
         let data: Vec<_> = nested.into_iter().flat_map(|v| v.into_iter()).collect();
         let shape = $crate::Shape::new($crate::shape::IxDyn::new(vec![rows, cols]));
-        $crate::array::Array::new(data).with_shape(shape)
+        $crate::array::Array::new(data, shape)
     }};
 
     // 3D array
@@ -28,6 +28,6 @@ macro_rules! arr {
             .flat_map(|v| v.into_iter())
             .collect();
         let shape = $crate::Shape::new($crate::shape::IxDyn::new(vec![depth, rows, cols]));
-        $crate::array::Array::new(data).with_shape(shape)
+        $crate::array::Array::new(data, shape)
     }};
 }
