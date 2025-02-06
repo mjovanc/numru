@@ -1,14 +1,14 @@
-use crate::shape::IxDyn;
-use crate::Shape;
+use crate::shape::{Shape, Dimension};
 
 #[derive(Debug)]
-pub struct Array<T> {
+pub struct Array<T, D: Dimension> {
     data: Vec<T>,
-    shape: Shape<IxDyn>, // TODO: we should have a generic Ix type here to allow for different index types
+    shape: Shape<D>,
 }
 
-impl<T> Array<T> {
-    pub fn new(data: Vec<T>, shape: Shape<IxDyn>) -> Self {
+impl<T, D: Dimension> Array<T, D> {
+    pub fn new(data: Vec<T>, shape: Shape<D>) -> Self {
+        assert_eq!(data.len(), shape.size(), "Data size must match shape size");
         Array { data, shape }
     }
 
@@ -16,18 +16,18 @@ impl<T> Array<T> {
         &self.data
     }
 
-    pub fn shape(&self) -> &Shape<IxDyn> {
+    pub fn shape(&self) -> &Shape<D> {
         &self.shape
     }
 }
 
-impl Array<i64> {
+impl<D: Dimension> Array<i64, D> {
     pub fn dtype(&self) -> &'static str {
         "int64"
     }
 }
 
-impl Array<f64> {
+impl<D: Dimension> Array<f64, D> {
     pub fn dtype(&self) -> &'static str {
         "float64"
     }
@@ -35,34 +35,45 @@ impl Array<f64> {
 
 #[cfg(test)]
 mod tests {
-    use super::Array;
+    use crate::shape::{Ix, Shape, Dimension};
+    use crate::array::Array;
 
     #[test]
-    fn test_array_creation() {
-        let a = arr![1, 2, 3];
-        assert_eq!(a.data(), &vec![1, 2, 3]);
-        assert_eq!(a.dtype(), "int64");
+    fn test_array_creation_1d() {
+        let data = vec![1, 2, 3, 4];
+        let shape = Shape::new(Ix::<1>::new([4]));
 
-        let f = arr![1.0, 2.0, 3.0];
-        assert_eq!(f.data(), &vec![1.0, 2.0, 3.0]);
-        assert_eq!(f.dtype(), "float64");
+        let array = Array::new(data.clone(), shape.clone());
+
+        assert_eq!(array.data(), &data);
+        assert_eq!(array.shape().raw_dim().size(), 4);
+        assert_eq!(array.shape().raw_dim().ndim(), 1);
+        assert_eq!(format!("{:?}", array.shape()), format!("{:?}", shape));
     }
 
     #[test]
-    fn test_dtype_correctness() {
-        let a = arr![1, 2, 3];
-        assert_eq!(a.dtype(), "int64");
+    fn test_array_creation_2d() {
+        let data = vec![1, 2, 3, 4, 5, 6];
+        let shape = Shape::new(Ix::<2>::new([3, 2])); // 3 rows, 2 columns
 
-        let b = arr![1.0, 2.0, 3.0];
-        assert_eq!(b.dtype(), "float64");
+        let array = Array::new(data.clone(), shape.clone());
+
+        assert_eq!(array.data(), &data);
+        assert_eq!(array.shape().raw_dim().size(), 6);
+        assert_eq!(array.shape().raw_dim().ndim(), 2);
+        assert_eq!(format!("{:?}", array.shape()), format!("{:?}", shape));
     }
 
     #[test]
-    fn test_array_creation_empty() {
-        let a: Array<i64> = arr![];
-        assert!(a.data().is_empty());
+    fn test_array_creation_3d() {
+        let data = vec![1, 2, 3, 4, 5, 6, 7, 8];
+        let shape = Shape::new(Ix::<3>::new([2, 2, 2])); // 2 blocks, 2 rows, 2 columns
 
-        let a: Array<f64> = arr![];
-        assert!(a.data().is_empty());
+        let array = Array::new(data.clone(), shape.clone());
+
+        assert_eq!(array.data(), &data);
+        assert_eq!(array.shape().raw_dim().size(), 8);
+        assert_eq!(array.shape().raw_dim().ndim(), 3);
+        assert_eq!(format!("{:?}", array.shape()), format!("{:?}", shape));
     }
 }

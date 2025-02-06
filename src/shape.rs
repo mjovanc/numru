@@ -40,56 +40,28 @@ where
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct StrideShape<D> {
-    _dims: D,
-    strides: D,
-}
-
-impl<D> StrideShape<D>
-where
-    D: Dimension,
-{
-    pub fn new(_dims: D, strides: D) -> Self {
-        StrideShape { _dims, strides }
-    }
-
-    pub fn strides(&self) -> &D {
-        &self.strides
-    }
-
-    pub fn set_strides(mut self, strides: D) -> Self {
-        self.strides = strides;
-        self
-    }
-}
-
 pub trait Dimension {
     fn ndim(&self) -> usize;
     fn size(&self) -> usize;
 }
 
-#[derive(Clone)]
-pub struct IxDyn {
-    dims: Vec<usize>,
+/// Fixed-size index type (e.g., `Ix<2>` for 2D, `Ix<3>` for 3D)
+#[derive(Debug, Clone, Copy)]
+pub struct Ix<const N: usize> {
+    dims: [usize; N],
 }
 
-impl IxDyn {
-    pub fn new(dims: Vec<usize>) -> Self {
-        IxDyn { dims }
+impl<const N: usize> Ix<N> {
+    pub fn new(dims: [usize; N]) -> Self {
+        Ix { dims }
     }
 }
 
-impl Debug for IxDyn {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "IxDyn {{ dims: {:?} }}", self.dims)
-    }
-}
-
-impl Dimension for IxDyn {
+impl<const N: usize> Dimension for Ix<N> {
     fn ndim(&self) -> usize {
-        self.dims.len()
+        N
     }
+
     fn size(&self) -> usize {
         self.dims.iter().product()
     }
