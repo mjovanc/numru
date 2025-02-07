@@ -1,4 +1,5 @@
 use crate::shape::{Dimension, Shape};
+use crate::Axis;
 use std::fmt::{self, Display};
 use std::fmt::{Debug, Error, Formatter};
 
@@ -36,7 +37,7 @@ impl<D: Dimension> Array<f64, D> {
 }
 
 impl<T: PartialOrd + Copy, D: Dimension> Array<T, D> {
-    pub fn max(&self, axis: Option<usize>) -> Vec<T> {
+    pub fn max(&self, axis: Option<Axis>) -> Vec<T> {
         match axis {
             None => vec![*self
                 .data
@@ -48,9 +49,9 @@ impl<T: PartialOrd + Copy, D: Dimension> Array<T, D> {
                 let ndim = raw_dim.ndim();
 
                 assert!(
-                    axis < ndim,
+                    axis.index() < ndim,
                     "Axis {} is out of bounds for array with {} dimensions",
-                    axis,
+                    axis.index(),
                     ndim
                 );
 
@@ -64,7 +65,7 @@ impl<T: PartialOrd + Copy, D: Dimension> Array<T, D> {
                     let rows = raw_dim.dims()[0];
                     let cols = raw_dim.dims()[1];
 
-                    if axis == 0 {
+                    if axis.index() == 0 {
                         (0..cols)
                             .map(|col| {
                                 (0..rows)
@@ -73,7 +74,7 @@ impl<T: PartialOrd + Copy, D: Dimension> Array<T, D> {
                                     .unwrap()
                             })
                             .collect()
-                    } else if axis == 1 {
+                    } else if axis.index() == 1 {
                         (0..rows)
                             .map(|row| {
                                 self.data[row * cols..(row + 1) * cols]

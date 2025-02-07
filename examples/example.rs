@@ -1,4 +1,4 @@
-use numru::arr;
+use numru::{arr, Axis};
 use std::f64::consts::{E, PI, TAU};
 
 fn main() {
