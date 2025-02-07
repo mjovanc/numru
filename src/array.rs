@@ -1,7 +1,7 @@
 use crate::shape::{Dimension, Shape};
 use crate::Axis;
-use std::fmt::{self, Display};
-use std::fmt::{Debug, Error, Formatter};
+use std::fmt::Debug;
+use std::fmt::Display;
 
 #[derive(Debug)]
 pub struct Array<T, D: Dimension> {
@@ -183,7 +183,10 @@ impl<D: Dimension, T: Display> Array<T, D> {
 
 #[cfg(test)]
 mod tests {
-    use crate::shape::{Dimension, Ix, Shape};
+    use crate::{
+        shape::{Dimension, Shape},
+        Ix,
+    };
 
     #[test]
     fn test_array_creation_i64_1d() {

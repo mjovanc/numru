@@ -104,7 +104,7 @@ macro_rules! arr {
         let data_3d = flatten_3d(&temp_3d);
         let shape_3d = get_shape_3d(&temp_3d);
 
-        $crate::Array::new(data_3d, $crate::Shape::new($crate::shape::Ix::<3>::new(shape_3d.try_into().unwrap())))
+        $crate::Array::new(data_3d, $crate::Shape::new($crate::ix::Ix::<3>::new(shape_3d.try_into().unwrap())))
     }};
 
     ($([$($elems:expr),+]),+ $(,)?) => {{
@@ -124,12 +124,12 @@ macro_rules! arr {
         let data = flatten(&temp);
         let shape = get_shape(&temp);
 
-        $crate::Array::new(data, $crate::Shape::new($crate::shape::Ix::<2>::new(shape.try_into().unwrap())))
+        $crate::Array::new(data, $crate::Shape::new($crate::ix::Ix::<2>::new(shape.try_into().unwrap())))
     }};
 
     ($($elem:expr),+ $(,)?) => {{
         let data = vec![$($elem),+];
         let shape = vec![data.len()];
-        $crate::Array::new(data, $crate::Shape::new($crate::shape::Ix::<1>::new(shape.try_into().unwrap())))
+        $crate::Array::new(data, $crate::Shape::new($crate::ix::Ix::<1>::new(shape.try_into().unwrap())))
     }};
 }
