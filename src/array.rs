@@ -36,11 +36,11 @@ impl<D: Dimension> Array<f64, D> {
 #[cfg(test)]
 mod tests {
     use crate::shape::{Ix, Shape, Dimension};
-    use crate::array::Array;
+    use crate::Array;
 
     #[test]
     fn test_array_creation_1d() {
-        let data = vec![1, 2, 3, 4];
+        let data = vec![1, 2, 3, 4]; // TODO: change to arr![] later
         let shape = Shape::new(Ix::<1>::new([4]));
 
         let array = Array::new(data.clone(), shape.clone());
@@ -53,7 +53,7 @@ mod tests {
 
     #[test]
     fn test_array_creation_2d() {
-        let data = vec![1, 2, 3, 4, 5, 6];
+        let data = vec![1, 2, 3, 4, 5, 6]; // TODO: change to arr![] later
         let shape = Shape::new(Ix::<2>::new([3, 2])); // 3 rows, 2 columns
 
         let array = Array::new(data.clone(), shape.clone());
@@ -66,7 +66,7 @@ mod tests {
 
     #[test]
     fn test_array_creation_3d() {
-        let data = vec![1, 2, 3, 4, 5, 6, 7, 8];
+        let data = vec![1, 2, 3, 4, 5, 6, 7, 8]; // TODO: change to arr![] later
         let shape = Shape::new(Ix::<3>::new([2, 2, 2])); // 2 blocks, 2 rows, 2 columns
 
         let array = Array::new(data.clone(), shape.clone());

@@ -84,8 +84,32 @@
 /// the array’s contents and shape effectively.
 #[macro_export]
 macro_rules! arr {
-    ($($elem:expr),* $(,)? ) => {{
-        let mut data = Vec::new();
-        let mut shape = Vec::new();
+    // Recursive case: Nested arrays
+    ($([$($elems:tt),+]),+ $(,)?) => {{
+        fn flatten<T: Clone>(nested: &[Vec<T>]) -> Vec<T> {
+            nested.iter().flat_map(|inner| inner.clone()).collect()
+        }
+
+        fn get_shape<T>(nested: &[Vec<T>]) -> Vec<usize> {
+            let mut shape = vec![nested.len()];
+            if let Some(first) = nested.first() {
+                shape.push(first.len());
+            }
+            shape
+        }
+
+        let temp = vec![$(vec![$($elems),+]),+]; // Collect into a Vec<Vec<T>>
+        let data = flatten(&temp); // Fully flatten
+        print!("Flattened data:");
+        let shape = get_shape(&temp); // Get shape
+
+        $crate::Array::new(data, $crate::Shape::new($crate::shape::Ix::<2>::new(shape.try_into().unwrap())))
+    }};
+
+    // Base case: Single scalar (1D array)
+    ($($elem:expr),+ $(,)?) => {{
+        let data = vec![$($elem),+]; // Collect scalars into a vector
+        let shape = vec![data.len()]; // 1D shape
+        $crate::Array::new(data, $crate::Shape::new($crate::shape::Ix::<1>::new(shape.try_into().unwrap())))
     }};
 }
