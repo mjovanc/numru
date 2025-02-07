@@ -26,21 +26,44 @@ And a simple code:
 ```rust
 fn main() {
     let a = arr![42, -17, 256, 3, 99, -8];
-    println!("{:?}", a);
+    println!("1D Shape={:?}", a.shape());
+    a.visualize();
 
-    let b = arr![
-        [TAU, -PI, 1.61],
-        [E,  0.98, -7.42],
-        [4.67, -0.45, 8.88],
-    ];
-    println!("{:?}", b);
+    let b = arr![[TAU, -PI, 1.61], [E, 0.98, -7.42], [4.67, -0.45, 8.88]];
+    println!("2D Shape={:?}", b.shape());
+    b.visualize();
 
     let c = arr![
         [[101, 202, 303], [404, 505, 606]],
         [[-707, -808, -909], [111, 222, 333]]
     ];
-    println!("{:?}", c);
+    println!("3D Shape={:?}", c.shape());
+    c.visualize();
 }
+```
+
+Output of the code above:
+
+```shell
+1D Shape=Shape=Ix { dims: [6] }
+[42, -17, 256, 3, 99, -8]
+2D Shape=Shape=Ix { dims: [3, 3] }
+[
+   [6.283185307179586, -3.141592653589793, 1.61 ]
+   [2.718281828459045, 0.98              , -7.42]
+   [4.67             , -0.45             , 8.88 ]
+]
+3D Shape=Shape=Ix { dims: [2, 2, 3] }
+[
+   [
+      [101 , 202 , 303 ]
+      [404 , 505 , 606 ]
+   ]
+   [
+      [-707, -808, -909]
+      [111 , 222 , 333 ]
+   ]
+]
 ```
 
 ## Features
