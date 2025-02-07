@@ -85,6 +85,7 @@
 #[macro_export]
 macro_rules! arr {
     // Recursive case: Nested arrays
+    // TODO: add support for 3D and higher-dimensional arrays
     ($([$($elems:tt),+]),+ $(,)?) => {{
         fn flatten<T: Clone>(nested: &[Vec<T>]) -> Vec<T> {
             nested.iter().flat_map(|inner| inner.clone()).collect()
@@ -98,18 +99,18 @@ macro_rules! arr {
             shape
         }
 
-        let temp = vec![$(vec![$($elems),+]),+]; // Collect into a Vec<Vec<T>>
-        let data = flatten(&temp); // Fully flatten
+        let temp = vec![$(vec![$($elems),+]),+];
+        let data = flatten(&temp);
         print!("Flattened data:");
-        let shape = get_shape(&temp); // Get shape
+        let shape = get_shape(&temp);
 
         $crate::Array::new(data, $crate::Shape::new($crate::shape::Ix::<2>::new(shape.try_into().unwrap())))
     }};
 
     // Base case: Single scalar (1D array)
     ($($elem:expr),+ $(,)?) => {{
-        let data = vec![$($elem),+]; // Collect scalars into a vector
-        let shape = vec![data.len()]; // 1D shape
+        let data = vec![$($elem),+];
+        let shape = vec![data.len()];
         $crate::Array::new(data, $crate::Shape::new($crate::shape::Ix::<1>::new(shape.try_into().unwrap())))
     }};
 }
