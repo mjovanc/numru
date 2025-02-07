@@ -180,4 +180,40 @@ mod tests {
         assert_eq!(data.shape().raw_dim().ndim(), 3);
         assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
     }
+
+    #[test]
+    fn test_array_creation_f64_1d() {
+        let data = arr![1.1, 2.2, 3.3, 4.4];
+        let ix = Ix::<1>::new([4]);
+        let shape = Shape::new(ix);
+
+        assert_eq!(data.shape().raw_dim().size(), 4);
+        assert_eq!(data.shape().raw_dim().ndim(), 1);
+        assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
+    }
+
+    #[test]
+    fn test_array_creation_f64_2d() {
+        let data = arr![[1.1, 2.2], [3.3, 4.4], [5.5, 6.6]];
+        let ix = Ix::<2>::new([3, 2]);
+        let shape = Shape::new(ix);
+
+        assert_eq!(data.shape().raw_dim().size(), 6);
+        assert_eq!(data.shape().raw_dim().ndim(), 2);
+        assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
+    }
+
+    #[test]
+    fn test_array_creation_f64_3d() {
+        let data = arr![
+            [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
+            [[7.7, 8.8, 9.9], [10.0, 11.1, 12.2]]
+        ];
+        let ix = Ix::<3>::new([2, 2, 3]);
+        let shape = Shape::new(ix);
+
+        assert_eq!(data.shape().raw_dim().size(), 12);
+        assert_eq!(data.shape().raw_dim().ndim(), 3);
+        assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
+    }
 }
