@@ -101,7 +101,6 @@ macro_rules! arr {
 
         let temp = vec![$(vec![$($elems),+]),+];
         let data = flatten(&temp);
-        print!("Flattened data:");
         let shape = get_shape(&temp);
 
         $crate::Array::new(data, $crate::Shape::new($crate::shape::Ix::<2>::new(shape.try_into().unwrap())))
