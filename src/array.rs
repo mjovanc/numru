@@ -27,35 +27,71 @@ impl<D: Dimension> Array<i64, D> {
     pub fn dtype(&self) -> &'static str {
         "int64"
     }
-
-    pub fn mean(&self, axis: Option<usize>) -> Vec<i64> {
-        !unimplemented!()
-    }
-
-    pub fn min(&self, axis: Option<usize>) -> i64 {
-        !unimplemented!()
-    }
-
-    pub fn max(&self, axis: Option<usize>) -> i64 {
-        !unimplemented!()
-    }
 }
 
 impl<D: Dimension> Array<f64, D> {
     pub fn dtype(&self) -> &'static str {
         "float64"
     }
+}
 
-    pub fn mean(&self, axis: Option<usize>) -> Vec<f64> {
-        !unimplemented!()
-    }
+impl<T: PartialOrd + Copy, D: Dimension> Array<T, D> {
+    pub fn max(&self, axis: Option<usize>) -> Vec<T> {
+        match axis {
+            None => vec![*self
+                .data
+                .iter()
+                .max_by(|a, b| a.partial_cmp(b).unwrap())
+                .expect("Array is empty")],
+            Some(axis) => {
+                let raw_dim = self.shape.raw_dim();
+                let ndim = raw_dim.ndim();
 
-    pub fn min(&self, axis: Option<usize>) -> f64 {
-        !unimplemented!()
-    }
+                assert!(
+                    axis < ndim,
+                    "Axis {} is out of bounds for array with {} dimensions",
+                    axis,
+                    ndim
+                );
 
-    pub fn max(&self, axis: Option<usize>) -> f64 {
-        !unimplemented!()
+                if ndim == 1 {
+                    vec![*self
+                        .data
+                        .iter()
+                        .max_by(|a, b| a.partial_cmp(b).unwrap())
+                        .expect("Array is empty")]
+                } else if ndim == 2 {
+                    let rows = raw_dim.dims()[0];
+                    let cols = raw_dim.dims()[1];
+
+                    if axis == 0 {
+                        (0..cols)
+                            .map(|col| {
+                                (0..rows)
+                                    .map(|row| self.data[row * cols + col])
+                                    .max_by(|a, b| a.partial_cmp(b).unwrap())
+                                    .unwrap()
+                            })
+                            .collect()
+                    } else if axis == 1 {
+                        (0..rows)
+                            .map(|row| {
+                                self.data[row * cols..(row + 1) * cols]
+                                    .iter()
+                                    .max_by(|a, b| a.partial_cmp(b).unwrap())
+                                    .unwrap()
+                                    .to_owned()
+                            })
+                            .collect()
+                    } else {
+                        unreachable!()
+                    }
+                } else {
+                    // TODO: Extend for 3D and beyond
+                    unimplemented!()
+                }
+            }
+        }
     }
 }
 
