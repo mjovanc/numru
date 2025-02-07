@@ -20,6 +20,10 @@ where
     pub fn size(&self) -> usize {
         self.dims.size()
     }
+
+    pub fn dims(&self) -> &[usize] {
+        self.dims.dims()
+    }
 }
 
 impl<D> Debug for Shape<D>
@@ -43,6 +47,7 @@ where
 pub trait Dimension {
     fn ndim(&self) -> usize;
     fn size(&self) -> usize;
+    fn dims(&self) -> &[usize];
 }
 
 /// Fixed-size index type (e.g., `Ix<2>` for 2D, `Ix<3>` for 3D)
@@ -64,5 +69,9 @@ impl<const N: usize> Dimension for Ix<N> {
 
     fn size(&self) -> usize {
         self.dims.iter().product()
+    }
+
+    fn dims(&self) -> &[usize] {
+        &self.dims
     }
 }

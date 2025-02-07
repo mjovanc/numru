@@ -1,5 +1,5 @@
-use crate::shape::{Shape, Dimension};
-use std::fmt;
+use crate::shape::{Dimension, Shape};
+use std::fmt::{self, Display};
 use std::fmt::{Debug, Error, Formatter};
 
 #[derive(Debug)]
@@ -59,64 +59,66 @@ impl<D: Dimension> Array<f64, D> {
     }
 }
 
-// impl<T, D> Debug for Array<T, D>
-// where
-//     T: Debug,
-//     D: Dimension,
-// {
-//     fn fmt(&self, f: &mut Formatter<'_>) -> Result<T, Error> {
-//         let ndim = self.shape.raw_dim().ndim();
-//         let size = self.shape.size();
-//
-//         // Handle 1D arrays
-//         if ndim == 1 {
-//             write!(f, "[")?;
-//             for (i, elem) in self.data.iter().enumerate() {
-//                 if i != 0 {
-//                     write!(f, ", ")?;
-//                 }
-//                 write!(f, "{:?}", elem)?;
-//             }
-//             write!(f, "]")?;
-//         } else if ndim == 2 {
-//             // Handle 2D arrays
-//             write!(f, "[\n")?;
-//             let mut start = 0;
-//             let rows = self.shape.raw_dim().ndim(); // Number of rows in 2D array
-//             let cols = self.shape.raw_dim().dims()[1]; // Number of columns in 2D array
-//
-//             for i in 0..rows {
-//                 write!(f, "   [")?;
-//                 for j in 0..cols {
-//                     let idx = start + j;
-//                     if j != 0 {
-//                         write!(f, ", ")?;
-//                     }
-//                     write!(f, "{:?}", self.data[idx])?;
-//                 }
-//                 write!(f, "]")?;
-//                 if i != rows - 1 {
-//                     write!(f, ",\n")?;
-//                 }
-//                 start += cols;
-//             }
-//             write!(f, "\n]")?;
-//         } else {
-//             write!(f, "Unsupported dimension: {}", ndim)?;
-//         }
-//
-//         Ok(())
-//     }
-// }
+impl<D: Dimension, T: Display> Array<T, D> {
+    pub fn visualize(&self) {
+        let dims = self.shape.dims();
+        let ndim = dims.len();
+
+        if ndim == 1 {
+            let rows = dims[0];
+            print!("[");
+            for i in 0..rows {
+                let value = &self.data[i];
+                let value_str = format!("{}", value);
+                print!("{}", value_str);
+                if i < rows - 1 {
+                    print!(", ");
+                }
+            }
+            println!("]");
+        } else if ndim == 2 {
+            let rows = dims[0];
+            let cols = dims[1];
+
+            let mut column_widths = vec![0; cols];
+            for i in 0..rows {
+                for j in 0..cols {
+                    let value = &self.data[i * cols + j];
+                    let width = format!("{}", value).len();
+                    column_widths[j] = column_widths[j].max(width);
+                }
+            }
+
+            println!("[");
+            for i in 0..rows {
+                print!("   [");
+                for j in 0..cols {
+                    let value = &self.data[i * cols + j];
+                    let value_str = format!("{}", value);
+                    print!("{:width$}", value_str, width = column_widths[j]);
+                    if j < cols - 1 {
+                        print!(", ");
+                    }
+                }
+                println!("]");
+            }
+            println!("]");
+        } else {
+            // Handle higher dimensions (3D, 4D, etc.) in the future if needed
+            println!("Unsupported dimension: {}", ndim);
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
-    use crate::shape::{Ix, Shape, Dimension};
+    use crate::shape::{Dimension, Ix, Shape};
 
     #[test]
-    fn test_array_creation_1d() {
+    fn test_array_creation_i64_1d() {
         let data = arr![1, 2, 3, 4];
-        let shape = Shape::new(Ix::<1>::new([4]));
+        let ix = Ix::<1>::new([4]);
+        let shape = Shape::new(ix);
 
         assert_eq!(data.shape().raw_dim().size(), 4);
         assert_eq!(data.shape().raw_dim().ndim(), 1);
@@ -124,13 +126,24 @@ mod tests {
     }
 
     #[test]
-    fn test_array_creation_2d() {
+    fn test_array_creation_i64_2d() {
         let data = arr![[1, 2], [3, 4], [5, 6]];
-        let shape = Shape::new(Ix::<2>::new([3, 2]));
+        let ix = Ix::<2>::new([3, 2]);
+        let shape = Shape::new(ix);
 
         assert_eq!(data.shape().raw_dim().size(), 6);
         assert_eq!(data.shape().raw_dim().ndim(), 2);
         assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
     }
 
+    #[test]
+    fn test_array_creation_i64_3d() {
+        let data = arr![[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]];
+        let ix = Ix::<3>::new([2, 2, 3]);
+        let shape = Shape::new(ix);
+
+        assert_eq!(data.shape().raw_dim().size(), 12);
+        assert_eq!(data.shape().raw_dim().ndim(), 3);
+        assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
+    }
 }
