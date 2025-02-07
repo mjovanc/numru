@@ -1,4 +1,6 @@
 use crate::shape::{Shape, Dimension};
+use std::fmt;
+use std::fmt::{Debug, Error, Formatter};
 
 #[derive(Debug)]
 pub struct Array<T, D: Dimension> {
@@ -56,6 +58,56 @@ impl<D: Dimension> Array<f64, D> {
         !unimplemented!()
     }
 }
+
+// impl<T, D> Debug for Array<T, D>
+// where
+//     T: Debug,
+//     D: Dimension,
+// {
+//     fn fmt(&self, f: &mut Formatter<'_>) -> Result<T, Error> {
+//         let ndim = self.shape.raw_dim().ndim();
+//         let size = self.shape.size();
+//
+//         // Handle 1D arrays
+//         if ndim == 1 {
+//             write!(f, "[")?;
+//             for (i, elem) in self.data.iter().enumerate() {
+//                 if i != 0 {
+//                     write!(f, ", ")?;
+//                 }
+//                 write!(f, "{:?}", elem)?;
+//             }
+//             write!(f, "]")?;
+//         } else if ndim == 2 {
+//             // Handle 2D arrays
+//             write!(f, "[\n")?;
+//             let mut start = 0;
+//             let rows = self.shape.raw_dim().ndim(); // Number of rows in 2D array
+//             let cols = self.shape.raw_dim().dims()[1]; // Number of columns in 2D array
+//
+//             for i in 0..rows {
+//                 write!(f, "   [")?;
+//                 for j in 0..cols {
+//                     let idx = start + j;
+//                     if j != 0 {
+//                         write!(f, ", ")?;
+//                     }
+//                     write!(f, "{:?}", self.data[idx])?;
+//                 }
+//                 write!(f, "]")?;
+//                 if i != rows - 1 {
+//                     write!(f, ",\n")?;
+//                 }
+//                 start += cols;
+//             }
+//             write!(f, "\n]")?;
+//         } else {
+//             write!(f, "Unsupported dimension: {}", ndim)?;
+//         }
+//
+//         Ok(())
+//     }
+// }
 
 #[cfg(test)]
 mod tests {
