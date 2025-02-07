@@ -103,8 +103,42 @@ impl<D: Dimension, T: Display> Array<T, D> {
                 println!("]");
             }
             println!("]");
+        } else if ndim == 3 {
+            let depth = dims[0];
+            let rows = dims[1];
+            let cols = dims[2];
+
+            let mut column_widths = vec![0; cols];
+            for i in 0..depth {
+                for j in 0..rows {
+                    for k in 0..cols {
+                        let value = &self.data[(i * rows * cols) + (j * cols) + k];
+                        let width = format!("{}", value).len();
+                        column_widths[k] = column_widths[k].max(width);
+                    }
+                }
+            }
+
+            println!("[");
+            for i in 0..depth {
+                println!("   [");
+                for j in 0..rows {
+                    print!("      [");
+                    for k in 0..cols {
+                        let value = &self.data[(i * rows * cols) + (j * cols) + k];
+                        let value_str = format!("{}", value);
+                        print!("{:width$}", value_str, width = column_widths[k]);
+                        if k < cols - 1 {
+                            print!(", ");
+                        }
+                    }
+                    println!("]");
+                }
+                println!("   ]");
+            }
+            println!("]");
         } else {
-            // Handle higher dimensions (3D, 4D, etc.) in the future if needed
+            // Handle higher dimensions (4D, 5D, etc.) in the future if needed
             println!("Unsupported dimension: {}", ndim);
         }
     }

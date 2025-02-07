@@ -84,8 +84,29 @@
 /// the array’s contents and shape effectively.
 #[macro_export]
 macro_rules! arr {
-    // Recursive case: Nested arrays
-    // TODO: add support for 3D and higher-dimensional arrays
+    ($([$([$($elems:expr),+]),+]),+ $(,)?) => {{
+        fn flatten_3d<T: Clone>(nested: &[Vec<Vec<T>>]) -> Vec<T> {
+            nested.iter().flat_map(|inner| inner.iter().flat_map(|v| v.clone())).collect()
+        }
+
+        fn get_shape_3d<T>(nested: &[Vec<Vec<T>>]) -> Vec<usize> {
+            let mut shape = vec![nested.len()];
+            if let Some(first) = nested.first() {
+                shape.push(first.len());
+                if let Some(second) = first.first() {
+                    shape.push(second.len());
+                }
+            }
+            shape
+        }
+
+        let temp_3d = vec![$(vec![$(vec![$($elems),+]),+]),+];
+        let data_3d = flatten_3d(&temp_3d);
+        let shape_3d = get_shape_3d(&temp_3d);
+
+        $crate::Array::new(data_3d, $crate::Shape::new($crate::shape::Ix::<3>::new(shape_3d.try_into().unwrap())))
+    }};
+
     ($([$($elems:expr),+]),+ $(,)?) => {{
         fn flatten<T: Clone>(nested: &[Vec<T>]) -> Vec<T> {
             nested.iter().flat_map(|inner| inner.clone()).collect()
@@ -106,7 +127,6 @@ macro_rules! arr {
         $crate::Array::new(data, $crate::Shape::new($crate::shape::Ix::<2>::new(shape.try_into().unwrap())))
     }};
 
-    // Base case: Single scalar (1D array)
     ($($elem:expr),+ $(,)?) => {{
         let data = vec![$($elem),+];
         let shape = vec![data.len()];
