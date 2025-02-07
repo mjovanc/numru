@@ -86,7 +86,7 @@
 macro_rules! arr {
     // Recursive case: Nested arrays
     // TODO: add support for 3D and higher-dimensional arrays
-    ($([$($elems:tt),+]),+ $(,)?) => {{
+    ($([$($elems:expr),+]),+ $(,)?) => {{
         fn flatten<T: Clone>(nested: &[Vec<T>]) -> Vec<T> {
             nested.iter().flat_map(|inner| inner.clone()).collect()
         }

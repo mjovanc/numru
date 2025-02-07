@@ -1,5 +1,5 @@
-use numru::{arr};
-// use std::f64::consts::{E, PI, TAU};
+use numru::arr;
+use std::f64::consts::{E, PI, TAU};
 
 fn main() {
     println!("#1 example:");
@@ -7,11 +7,9 @@ fn main() {
     println!("a={:?}", a);
 
     println!("\n#2 example:");
-    // let b = arr![[TAU, -PI, 1.61], [E, 0.98, -7.42], [4.67, -0.45, 8.88]];
-    let b = arr![[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+    let b = arr![[TAU, -PI, 1.61], [E, 0.98, -7.42], [4.67, -0.45, 8.88]];
+    // let b = arr![[1, 2, 3], [4, 5, 6], [7, 8, 9]];
     println!("b={:?}", b);
-
-
 
     // println!("\n#3 example:");
     // let c = arr![
