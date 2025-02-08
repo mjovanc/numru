@@ -1,9 +1,10 @@
 use crate::shape::Shape;
 use crate::Dimension;
-use std::fmt;
 use std::fmt::Debug;
 use std::fmt::Display;
-use std::fmt::Formatter;
+use std::iter::Sum;
+use std::ops::Add;
+use std::ops::Div;
 
 #[derive(Debug)]
 pub struct Array<T, D: Dimension> {
@@ -38,45 +39,19 @@ impl<D: Dimension> Array<f64, D> {
     }
 }
 
-impl<T: PartialOrd + Copy, D: Dimension> Array<T, D> {
-    pub fn max(&self) -> MaxBuilder<T, D> {
-        MaxBuilder::new(self)
-    }
-}
-
-pub struct MaxBuilder<'a, T, D>
+impl<T, D: Dimension> Array<T, D>
 where
     T: PartialOrd + Copy,
-    D: Dimension,
 {
-    array: &'a Array<T, D>,
-    axis: Option<usize>,
-}
-
-impl<'a, T, D> MaxBuilder<'a, T, D>
-where
-    T: PartialOrd + Copy,
-    D: Dimension,
-{
-    pub fn new(array: &'a Array<T, D>) -> Self {
-        Self { array, axis: None }
-    }
-
-    pub fn axis(mut self, axis: usize) -> Self {
-        self.axis = Some(axis);
-        self
-    }
-
-    pub fn compute(self) -> Vec<T> {
-        let array = self.array;
-        match self.axis {
-            None => vec![*array
+    pub fn max_compute(&self, axis: Option<usize>) -> Vec<T> {
+        match axis {
+            None => vec![*self
                 .data
                 .iter()
                 .max_by(|a, b| a.partial_cmp(b).unwrap())
                 .expect("Array is empty")],
             Some(axis) => {
-                let raw_dim = array.shape.raw_dim();
+                let raw_dim = self.shape.raw_dim();
                 let ndim = raw_dim.ndim();
 
                 assert!(
@@ -87,7 +62,7 @@ where
                 );
 
                 match ndim {
-                    1 => vec![*array
+                    1 => vec![*self
                         .data
                         .iter()
                         .max_by(|a, b| a.partial_cmp(b).unwrap())
@@ -100,7 +75,7 @@ where
                             (0..cols)
                                 .map(|col| {
                                     (0..rows)
-                                        .map(|row| array.data[row * cols + col])
+                                        .map(|row| self.data[row * cols + col])
                                         .max_by(|a, b| a.partial_cmp(b).unwrap())
                                         .unwrap()
                                 })
@@ -108,7 +83,7 @@ where
                         } else {
                             (0..rows)
                                 .map(|row| {
-                                    array.data[row * cols..(row + 1) * cols]
+                                    self.data[row * cols..(row + 1) * cols]
                                         .iter()
                                         .max_by(|a, b| a.partial_cmp(b).unwrap())
                                         .unwrap()
@@ -126,7 +101,7 @@ where
                             0 => (0..rows * cols)
                                 .map(|i| {
                                     (0..depth)
-                                        .map(|d| array.data[d * rows * cols + i])
+                                        .map(|d| self.data[d * rows * cols + i])
                                         .max_by(|a, b| a.partial_cmp(b).unwrap())
                                         .unwrap()
                                 })
@@ -135,7 +110,7 @@ where
                                 .flat_map(|d| {
                                     (0..cols).map(move |c| {
                                         (0..rows)
-                                            .map(|r| array.data[d * rows * cols + r * cols + c])
+                                            .map(|r| self.data[d * rows * cols + r * cols + c])
                                             .max_by(|a, b| a.partial_cmp(b).unwrap())
                                             .unwrap()
                                     })
@@ -145,7 +120,7 @@ where
                                 .flat_map(|d| {
                                     (0..rows).map(move |r| {
                                         let row_start = d * rows * cols + r * cols;
-                                        array.data[row_start..row_start + cols]
+                                        self.data[row_start..row_start + cols]
                                             .iter()
                                             .max_by(|a, b| a.partial_cmp(b).unwrap())
                                             .unwrap()
@@ -161,25 +136,196 @@ where
             }
         }
     }
+
+    pub fn min_compute(&self, axis: Option<usize>) -> Vec<T> {
+        match axis {
+            None => vec![*self
+                .data
+                .iter()
+                .min_by(|a, b| a.partial_cmp(b).unwrap())
+                .expect("Array is empty")],
+            Some(axis) => {
+                let raw_dim = self.shape.raw_dim();
+                let ndim = raw_dim.ndim();
+
+                assert!(
+                    axis < ndim,
+                    "Axis {} is out of bounds for array with {} dimensions",
+                    axis,
+                    ndim
+                );
+
+                match ndim {
+                    1 => vec![*self
+                        .data
+                        .iter()
+                        .min_by(|a, b| a.partial_cmp(b).unwrap())
+                        .expect("Array is empty")],
+                    2 => {
+                        let rows = raw_dim.dims()[0];
+                        let cols = raw_dim.dims()[1];
+
+                        if axis == 0 {
+                            (0..cols)
+                                .map(|col| {
+                                    (0..rows)
+                                        .map(|row| self.data[row * cols + col])
+                                        .min_by(|a, b| a.partial_cmp(b).unwrap())
+                                        .unwrap()
+                                })
+                                .collect()
+                        } else {
+                            (0..rows)
+                                .map(|row| {
+                                    self.data[row * cols..(row + 1) * cols]
+                                        .iter()
+                                        .min_by(|a, b| a.partial_cmp(b).unwrap())
+                                        .unwrap()
+                                        .to_owned()
+                                })
+                                .collect()
+                        }
+                    }
+                    3 => {
+                        let depth = raw_dim.dims()[0];
+                        let rows = raw_dim.dims()[1];
+                        let cols = raw_dim.dims()[2];
+
+                        match axis {
+                            0 => (0..rows * cols)
+                                .map(|i| {
+                                    (0..depth)
+                                        .map(|d| self.data[d * rows * cols + i])
+                                        .min_by(|a, b| a.partial_cmp(b).unwrap())
+                                        .unwrap()
+                                })
+                                .collect(),
+                            1 => (0..depth)
+                                .flat_map(|d| {
+                                    (0..cols).map(move |c| {
+                                        (0..rows)
+                                            .map(|r| self.data[d * rows * cols + r * cols + c])
+                                            .min_by(|a, b| a.partial_cmp(b).unwrap())
+                                            .unwrap()
+                                    })
+                                })
+                                .collect(),
+                            2 => (0..depth)
+                                .flat_map(|d| {
+                                    (0..rows).map(move |r| {
+                                        let row_start = d * rows * cols + r * cols;
+                                        self.data[row_start..row_start + cols]
+                                            .iter()
+                                            .min_by(|a, b| a.partial_cmp(b).unwrap())
+                                            .unwrap()
+                                            .to_owned()
+                                    })
+                                })
+                                .collect(),
+                            _ => unreachable!(),
+                        }
+                    }
+                    _ => unimplemented!(),
+                }
+            }
+        }
+    }
 }
 
-impl<T, D> Debug for MaxBuilder<'_, T, D>
+impl<T, D: Dimension> Array<T, D>
 where
-    T: PartialOrd + Copy,
-    D: Dimension,
+    T: Copy + Add<Output = T> + Div<f64, Output = T> + Sum,
 {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.debug_struct("MaxBuilder")
-            .field(
-                "array",
-                &format_args!(
-                    "Array<{}, {}>",
-                    std::any::type_name::<T>(),
-                    std::any::type_name::<D>()
-                ),
-            )
-            .field("axis", &self.axis)
-            .finish()
+    pub fn mean_compute(&self, axis: Option<usize>) -> Vec<T> {
+        match axis {
+            None => {
+                let sum: T = self.data.iter().cloned().sum();
+                let count = self.data.len() as f64;
+                vec![sum / count]
+            }
+            Some(axis) => {
+                let raw_dim = self.shape.raw_dim();
+                let ndim = raw_dim.ndim();
+
+                assert!(
+                    axis < ndim,
+                    "Axis {} is out of bounds for array with {} dimensions",
+                    axis,
+                    ndim
+                );
+
+                match ndim {
+                    1 => {
+                        let sum: T = self.data.iter().cloned().sum();
+                        let count = self.data.len() as f64;
+                        vec![sum / count]
+                    }
+                    2 => {
+                        let rows = raw_dim.dims()[0];
+                        let cols = raw_dim.dims()[1];
+
+                        if axis == 0 {
+                            (0..cols)
+                                .map(|col| {
+                                    let sum: T =
+                                        (0..rows).map(|row| self.data[row * cols + col]).sum();
+                                    sum / rows as f64
+                                })
+                                .collect()
+                        } else {
+                            (0..rows)
+                                .map(|row| {
+                                    let sum: T = self.data[row * cols..(row + 1) * cols]
+                                        .iter()
+                                        .cloned()
+                                        .sum();
+                                    sum / cols as f64
+                                })
+                                .collect()
+                        }
+                    }
+                    3 => {
+                        let depth = raw_dim.dims()[0];
+                        let rows = raw_dim.dims()[1];
+                        let cols = raw_dim.dims()[2];
+
+                        match axis {
+                            0 => (0..rows * cols)
+                                .map(|i| {
+                                    let sum: T =
+                                        (0..depth).map(|d| self.data[d * rows * cols + i]).sum();
+                                    sum / depth as f64
+                                })
+                                .collect(),
+                            1 => (0..depth)
+                                .flat_map(|d| {
+                                    (0..cols).map(move |c| {
+                                        let sum: T = (0..rows)
+                                            .map(|r| self.data[d * rows * cols + r * cols + c])
+                                            .sum();
+                                        sum / rows as f64
+                                    })
+                                })
+                                .collect(),
+                            2 => (0..depth)
+                                .flat_map(|d| {
+                                    (0..rows).map(move |r| {
+                                        let row_start = d * rows * cols + r * cols;
+                                        let sum: T = self.data[row_start..row_start + cols]
+                                            .iter()
+                                            .cloned()
+                                            .sum();
+                                        sum / cols as f64
+                                    })
+                                })
+                                .collect(),
+                            _ => unreachable!(),
+                        }
+                    }
+                    _ => unimplemented!(),
+                }
+            }
+        }
     }
 }
 

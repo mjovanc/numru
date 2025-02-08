@@ -5,6 +5,7 @@ fn main() {
     let a = arr![42, -17, 256, 3, 99, -8];
     let a_max = a.max().compute();
     println!("a.max() = {:?}", a_max);
+    // Note: For 1D arrays, axis doesn't make sense, but this is for demonstration
     let a_max = a.max().axis(0).compute();
     println!("a.max().axis(0) = {:?}", a_max);
 

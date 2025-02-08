@@ -25,3 +25,7 @@ path = "examples/array.rs"
 [[example]]
 name = "max"
 path = "examples/max.rs"
+
+[[example]]
+name = "min"
+path = "examples/min.rs"
