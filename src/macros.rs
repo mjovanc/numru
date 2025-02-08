@@ -1,6 +1,6 @@
 /// Purpose:
 ///
-/// The `arr!` macro is designed to accept arrays of any depth (1D, 2D, 3D, etc.) and flatten them into a
+/// The `arr!` macro is designed to accept arrays of depth 1D, 2D and 3D and flatten them into a
 /// single-dimensional vector. It also tracks and stores the shape (dimensions) of the array, which includes
 /// the number of rows, columns, and further dimensions as needed.
 ///
@@ -76,12 +76,6 @@
 /// Flattened data: [1, 2, 3, 4, 5, 6, 7, 8]
 /// Shape: [2, 2, 2]
 /// ```
-///
-/// Future Extensions:
-///
-/// In the future, you could replace the placeholder part of the macro with logic to return a structured array
-/// (such as a custom `Shape` or `Array` type), but for now, this approach allows you to debug and visualize
-/// the array’s contents and shape effectively.
 #[macro_export]
 macro_rules! arr {
     ($([$([$($elems:expr),+]),+]),+ $(,)?) => {{

@@ -59,6 +59,11 @@ where
 {
     /// Computes the maximum value(s) of the array along a specified axis or for the whole array.
     ///
+    /// # Success
+    ///
+    /// - If `axis` is `None`, returns a single-element `Vec<T>` with the maximum value of the entire array.
+    /// - If `axis` is provided, returns a `Vec<T>` where each element is the maximum along that axis.
+    ///
     /// # Errors
     ///
     /// - Returns `ArrayError::EmptyArray` if the array is empty.
@@ -175,6 +180,11 @@ where
     }
 
     /// Computes the minimum value(s) of the array along a specified axis or for the whole array.
+    ///
+    /// # Success
+    ///
+    /// - If `axis` is `None`, returns a single-element `Vec<T>` with the minimum value of the entire array.
+    /// - If `axis` is provided, returns a `Vec<T>` where each element is the minimum along that axis.
     ///
     /// # Errors
     ///
