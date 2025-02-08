@@ -2,6 +2,7 @@ use crate::{Dimension, Shape};
 use std::fmt::Debug;
 use std::fmt::Display;
 
+/// Represents a multi-dimensional array with elements of type `T` and dimension `D`.
 #[derive(Debug)]
 pub struct Array<T, D: Dimension> {
     data: Vec<T>,
@@ -9,27 +10,36 @@ pub struct Array<T, D: Dimension> {
 }
 
 impl<T, D: Dimension> Array<T, D> {
+    /// Constructs a new `Array` from a vector of data and a shape.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the length of `data` does not match the size of `shape`.
     pub fn new(data: Vec<T>, shape: Shape<D>) -> Self {
         assert_eq!(data.len(), shape.size(), "Data size must match shape size");
         Array { data, shape }
     }
 
+    /// Returns a reference to the underlying data vector.
     pub fn data(&self) -> &Vec<T> {
         &self.data
     }
 
+    /// Returns a reference to the shape of the array.
     pub fn shape(&self) -> &Shape<D> {
         &self.shape
     }
 }
 
 impl<D: Dimension> Array<i64, D> {
+    /// Returns the data type string for an array of `i64`.
     pub fn dtype(&self) -> &'static str {
         "int64"
     }
 }
 
 impl<D: Dimension> Array<f64, D> {
+    /// Returns the data type string for an array of `f64`.
     pub fn dtype(&self) -> &'static str {
         "float64"
     }
@@ -39,6 +49,10 @@ impl<T, D: Dimension> Array<T, D>
 where
     T: PartialOrd + Copy,
 {
+    /// Computes the maximum value(s) of the array along a specified axis or for the whole array.
+    ///
+    /// - If `axis` is `None`, returns a single-element vector with the maximum value of the entire array.
+    /// - If `axis` is provided, returns a vector where each element is the maximum along that axis.
     pub fn max_compute(&self, axis: Option<usize>) -> Vec<T> {
         match axis {
             None => vec![*self
@@ -133,6 +147,10 @@ where
         }
     }
 
+    /// Computes the minimum value(s) of the array along a specified axis or for the whole array.
+    ///
+    /// - If `axis` is `None`, returns a single-element vector with the minimum value of the entire array.
+    /// - If `axis` is provided, returns a vector where each element is the minimum along that axis.
     pub fn min_compute(&self, axis: Option<usize>) -> Vec<T> {
         match axis {
             None => vec![*self
@@ -229,6 +247,12 @@ where
 }
 
 impl<D: Dimension, T: Display> Array<T, D> {
+    /// Visualizes the array by printing it in a formatted way according to its dimension:
+    ///
+    /// - 1D: Prints as a single line vector.
+    /// - 2D: Prints as a matrix with aligned columns.
+    /// - 3D: Prints each 2D slice within a 3D structure.
+    /// - Higher dimensions are not yet supported and will print an error message.
     pub fn visualize(&self) {
         let dims = self.shape.dims();
         let ndim = dims.len();

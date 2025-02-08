@@ -4,6 +4,7 @@ use std::fmt::Formatter;
 
 use crate::{Array, Dimension};
 
+/// A builder for computing the maximum values of an array.
 pub struct MaxBuilder<'a, T, D>
 where
     T: PartialOrd + Copy,
@@ -18,20 +19,24 @@ where
     T: PartialOrd + Copy,
     D: Dimension,
 {
+    /// Creates a new `MaxBuilder` with the given array.
     pub fn new(array: &'a Array<T, D>) -> Self {
         Self { array, axis: None }
     }
 
+    /// Sets the axis along which to compute the maximum.
     pub fn axis(mut self, axis: usize) -> Self {
         self.axis = Some(axis);
         self
     }
 
+    /// Computes the maximum values based on the current configuration.
     pub fn compute(self) -> Vec<T> {
         self.array.max_compute(self.axis)
     }
 }
 
+/// A builder for computing the minimum values of an array.
 pub struct MinBuilder<'a, T, D>
 where
     T: PartialOrd + Copy,
@@ -46,25 +51,30 @@ where
     T: PartialOrd + Copy,
     D: Dimension,
 {
+    /// Creates a new `MinBuilder` with the given array.
     pub fn new(array: &'a Array<T, D>) -> Self {
         Self { array, axis: None }
     }
 
+    /// Sets the axis along which to compute the minimum.
     pub fn axis(mut self, axis: usize) -> Self {
         self.axis = Some(axis);
         self
     }
 
+    /// Computes the minimum values based on the current configuration.
     pub fn compute(self) -> Vec<T> {
         self.array.min_compute(self.axis)
     }
 }
 
 impl<T: PartialOrd + Copy, D: Dimension> Array<T, D> {
+    /// Starts building a computation for the maximum values of this array.
     pub fn max(&self) -> MaxBuilder<T, D> {
         MaxBuilder::new(self)
     }
 
+    /// Starts building a computation for the minimum values of this array.
     pub fn min(&self) -> MinBuilder<T, D> {
         MinBuilder::new(self)
     }
@@ -75,6 +85,7 @@ where
     T: PartialOrd + Copy,
     D: Dimension,
 {
+    /// Formats the `MaxBuilder` for debugging.
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.debug_struct("MaxBuilder")
             .field(
@@ -95,6 +106,7 @@ where
     T: PartialOrd + Copy,
     D: Dimension,
 {
+    /// Formats the `MinBuilder` for debugging.
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.debug_struct("MinBuilder")
             .field(
