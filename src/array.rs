@@ -1,10 +1,6 @@
-use crate::shape::Shape;
-use crate::Dimension;
+use crate::{Dimension, Shape};
 use std::fmt::Debug;
 use std::fmt::Display;
-use std::iter::Sum;
-use std::ops::Add;
-use std::ops::Div;
 
 #[derive(Debug)]
 pub struct Array<T, D: Dimension> {
@@ -232,103 +228,6 @@ where
     }
 }
 
-impl<T, D: Dimension> Array<T, D>
-where
-    T: Copy + Add<Output = T> + Div<f64, Output = T> + Sum,
-{
-    pub fn mean_compute(&self, axis: Option<usize>) -> Vec<T> {
-        match axis {
-            None => {
-                let sum: T = self.data.iter().cloned().sum();
-                let count = self.data.len() as f64;
-                vec![sum / count]
-            }
-            Some(axis) => {
-                let raw_dim = self.shape.raw_dim();
-                let ndim = raw_dim.ndim();
-
-                assert!(
-                    axis < ndim,
-                    "Axis {} is out of bounds for array with {} dimensions",
-                    axis,
-                    ndim
-                );
-
-                match ndim {
-                    1 => {
-                        let sum: T = self.data.iter().cloned().sum();
-                        let count = self.data.len() as f64;
-                        vec![sum / count]
-                    }
-                    2 => {
-                        let rows = raw_dim.dims()[0];
-                        let cols = raw_dim.dims()[1];
-
-                        if axis == 0 {
-                            (0..cols)
-                                .map(|col| {
-                                    let sum: T =
-                                        (0..rows).map(|row| self.data[row * cols + col]).sum();
-                                    sum / rows as f64
-                                })
-                                .collect()
-                        } else {
-                            (0..rows)
-                                .map(|row| {
-                                    let sum: T = self.data[row * cols..(row + 1) * cols]
-                                        .iter()
-                                        .cloned()
-                                        .sum();
-                                    sum / cols as f64
-                                })
-                                .collect()
-                        }
-                    }
-                    3 => {
-                        let depth = raw_dim.dims()[0];
-                        let rows = raw_dim.dims()[1];
-                        let cols = raw_dim.dims()[2];
-
-                        match axis {
-                            0 => (0..rows * cols)
-                                .map(|i| {
-                                    let sum: T =
-                                        (0..depth).map(|d| self.data[d * rows * cols + i]).sum();
-                                    sum / depth as f64
-                                })
-                                .collect(),
-                            1 => (0..depth)
-                                .flat_map(|d| {
-                                    (0..cols).map(move |c| {
-                                        let sum: T = (0..rows)
-                                            .map(|r| self.data[d * rows * cols + r * cols + c])
-                                            .sum();
-                                        sum / rows as f64
-                                    })
-                                })
-                                .collect(),
-                            2 => (0..depth)
-                                .flat_map(|d| {
-                                    (0..rows).map(move |r| {
-                                        let row_start = d * rows * cols + r * cols;
-                                        let sum: T = self.data[row_start..row_start + cols]
-                                            .iter()
-                                            .cloned()
-                                            .sum();
-                                        sum / cols as f64
-                                    })
-                                })
-                                .collect(),
-                            _ => unreachable!(),
-                        }
-                    }
-                    _ => unimplemented!(),
-                }
-            }
-        }
-    }
-}
-
 impl<D: Dimension, T: Display> Array<T, D> {
     pub fn visualize(&self) {
         let dims = self.shape.dims();
@@ -416,7 +315,7 @@ impl<D: Dimension, T: Display> Array<T, D> {
 
 #[cfg(test)]
 mod tests {
-    use std::f64::consts::PI;
+    use std::f64::consts::{E, PI, TAU};
 
     use crate::{Dimension, Ix, Shape};
 
@@ -551,5 +450,71 @@ mod tests {
             vec![4.4, 5.5, 6.6, 10.0, 11.1, 12.2]
         );
         assert_eq!(data.max().axis(2).compute(), vec![3.3, 6.6, 9.9, 12.2]);
+    }
+
+    #[test]
+    fn min_i64_1d() {
+        let a = arr![42, -17, 256, 3, 99, -8];
+        assert_eq!(a.min().compute(), vec![-17]);
+        assert_eq!(a.min().axis(0).compute(), vec![-17]);
+    }
+
+    #[test]
+    fn min_f64_1d() {
+        let a = arr![PI, 2.71, -1.0, 42.0, 0.98];
+        assert_eq!(a.min().compute(), vec![-1.0]);
+        assert_eq!(a.min().axis(0).compute(), vec![-1.0]);
+    }
+
+    #[test]
+    fn min_i64_2d() {
+        let b = arr![[1, 5, 3], [4, 2, 6], [0, 9, 8]];
+        assert_eq!(b.min().compute(), vec![0]);
+        assert_eq!(b.min().axis(0).compute(), vec![0, 2, 3]);
+        assert_eq!(b.min().axis(1).compute(), vec![1, 2, 0]);
+    }
+
+    #[test]
+    fn min_f64_2d() {
+        let b = arr![[TAU, -PI, 1.61], [E, 0.98, -7.42], [4.67, -0.45, 8.88]];
+        assert_eq!(b.min().compute(), vec![-PI]);
+        assert_eq!(b.min().axis(0).compute(), vec![TAU, -PI, -7.42]);
+        assert_eq!(b.min().axis(1).compute(), vec![-PI, -7.42, -0.45]);
+    }
+
+    #[test]
+    fn min_i64_3d() {
+        let c = arr![
+            [[101, 202, 303], [404, 505, 606]],
+            [[-707, -808, -909], [111, 222, 333]]
+        ];
+        assert_eq!(c.min().compute(), vec![-909]);
+        assert_eq!(
+            c.min().axis(0).compute(),
+            vec![-707, -808, -909, 111, 222, 333]
+        );
+        assert_eq!(
+            c.min().axis(1).compute(),
+            vec![101, 202, 303, -707, -808, -909]
+        );
+        assert_eq!(c.min().axis(2).compute(), vec![101, 404, -909, 111]);
+    }
+
+    #[test]
+    fn min_f64_3d() {
+        let c = arr![
+            [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
+            [[7.7, 8.8, 9.9], [10.0, 11.1, 12.2]]
+        ];
+        assert_eq!(c.min().compute(), vec![1.1]);
+        assert_eq!(
+            c.min().axis(0).compute(),
+            vec![1.1, 2.2, 3.3, 4.4, 5.5, 6.6]
+        );
+        assert_eq!(
+            c.min().axis(1).compute(),
+            vec![1.1, 2.2, 3.3, 10.0, 11.1, 12.2]
+        );
+        assert_eq!(c.min().axis(2).compute(), vec![1.1, 4.4, 7.7, 10.0]);
     }
 }
