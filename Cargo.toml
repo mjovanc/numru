@@ -16,6 +16,7 @@ keywords = ["scientific", "computation", "numerical", "math", "array"]
 maintenance = { status = "actively-developed" }
 
 [dependencies]
+thiserror = "2"
 
 [[example]]
 name = "array"
