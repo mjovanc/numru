@@ -162,7 +162,7 @@ where
     }
 }
 
-impl<'a, T, D> Debug for MaxBuilder<'a, T, D>
+impl<T, D> Debug for MaxBuilder<'_, T, D>
 where
     T: PartialOrd + Copy,
     D: Dimension,
@@ -269,6 +269,8 @@ impl<D: Dimension, T: Display> Array<T, D> {
 
 #[cfg(test)]
 mod tests {
+    use std::f64::consts::PI;
+
     use crate::{
         shape::{Dimension, Shape},
         Ix,
@@ -351,7 +353,7 @@ mod tests {
 
     #[test]
     fn max_f64_1d() {
-        let data = arr![3.14, 2.71, -1.0, 42.0, 0.98];
+        let data = arr![PI, 2.71, -1.0, 42.0, 0.98];
         assert_eq!(data.max().compute(), vec![42.0]);
     }
 
@@ -365,14 +367,10 @@ mod tests {
 
     #[test]
     fn max_f64_2d() {
-        let data = arr![
-            [3.14, -2.71, 1.61],
-            [2.72, 0.98, -7.42],
-            [4.67, -0.45, 8.88]
-        ];
+        let data = arr![[PI, -2.71, 1.61], [2.72, 0.98, -7.42], [4.67, -0.45, 8.88]];
         assert_eq!(data.max().compute(), vec![8.88]);
         assert_eq!(data.max().axis(0).compute(), vec![4.67, 0.98, 8.88]);
-        assert_eq!(data.max().axis(1).compute(), vec![3.14, 2.72, 8.88]);
+        assert_eq!(data.max().axis(1).compute(), vec![PI, 2.72, 8.88]);
     }
 
     // TODO: these needs to be implemented correctly
