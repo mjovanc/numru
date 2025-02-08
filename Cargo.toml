@@ -18,5 +18,9 @@ maintenance = { status = "actively-developed" }
 [dependencies]
 
 [[example]]
-name = "example"
-path = "examples/example.rs"
+name = "array"
+path = "examples/array.rs"
+
+[[example]]
+name = "max"
+path = "examples/max.rs"
