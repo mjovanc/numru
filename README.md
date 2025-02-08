@@ -96,9 +96,9 @@ Note that currently we only show the numru equivalents as the ones that are plan
 | Ones Array          | `np.ones((3, 3, 3))`                   | 🚧             |
 | Arange             | `np.arange(start, stop, step)`      | 🚧 |
 | Linspace           | `np.linspace(start, stop, num)`     | 🚧 |
-| Mean               | `np.mean(a)`                        | `a.mean()`                 |
-| Min                | `np.min(a)`                         | `a.min()`                   |
-| Max                | `np.max(a)`                         | `a.max()`                   |
+| Mean               | `np.mean(a)`                        | `a.mean().compute()`                 |
+| Min                | `np.min(a)`                         | `a.min().compute()`                   |
+| Max                | `np.max(a)`                         | `a.max().compute()`                   |
 | Exp                | `np.exp(a)`                         | 🚧                   |
 | Log                | `np.log(a)`                         | 🚧                   |
 | Sigmoid            | `1 / (1 + np.exp(-a))`              | 🚧               |
