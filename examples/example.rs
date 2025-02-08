@@ -28,4 +28,10 @@ fn main() {
     c.visualize();
     let c_max = c.max().compute(); // TODO: need to check the implementation of max for 3D when using axis later
     println!("Max={:?}", c_max);
+    let c_max = c.max().axis(0).compute();
+    println!("Max Axis=0={:?}", c_max);
+    let c_max = c.max().axis(1).compute();
+    println!("Max Axis=1={:?}", c_max);
+    let c_max = c.max().axis(2).compute();
+    println!("Max Axis=2={:?}", c_max);
 }

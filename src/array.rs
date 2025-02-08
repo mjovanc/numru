@@ -143,8 +143,8 @@ where
                             2 => (0..depth)
                                 .flat_map(|d| {
                                     (0..rows).map(move |r| {
-                                        array.data[d * rows * cols + r * cols
-                                            ..d * rows * cols + (r + 1) * cols]
+                                        let row_start = d * rows * cols + r * cols;
+                                        array.data[row_start..row_start + cols]
                                             .iter()
                                             .max_by(|a, b| a.partial_cmp(b).unwrap())
                                             .unwrap()
@@ -373,40 +373,39 @@ mod tests {
         assert_eq!(data.max().axis(1).compute(), vec![PI, 2.72, 8.88]);
     }
 
-    // TODO: these needs to be implemented correctly
-    // #[test]
-    // fn max_i64_3d() {
-    //     let data = arr![
-    //         [[101, 202, 303], [404, 505, 606]],
-    //         [[-707, -808, -909], [111, 222, 333]]
-    //     ];
-    //     assert_eq!(data.max().compute(), vec![606]);
-    //     assert_eq!(
-    //         data.max().axis(0).compute(),
-    //         vec![101, 202, 303, 404, 505, 606]
-    //     );
-    //     assert_eq!(
-    //         data.max().axis(1).compute(),
-    //         vec![404, 505, 606, 111, 222, 333]
-    //     );
-    //     assert_eq!(data.max().axis(2).compute(), vec![303, 606, 222, 333]);
-    // }
+    #[test]
+    fn max_i64_3d() {
+        let data = arr![
+            [[101, 202, 303], [404, 505, 606]],
+            [[-707, -808, -909], [111, 222, 333]]
+        ];
+        assert_eq!(data.max().compute(), vec![606]);
+        assert_eq!(
+            data.max().axis(0).compute(),
+            vec![101, 202, 303, 404, 505, 606]
+        );
+        assert_eq!(
+            data.max().axis(1).compute(),
+            vec![404, 505, 606, 111, 222, 333]
+        );
+        assert_eq!(data.max().axis(2).compute(), vec![303, 606, -707, 333]);
+    }
 
-    // #[test]
-    // fn max_f64_3d() {
-    //     let data = arr![
-    //         [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
-    //         [[7.7, 8.8, 9.9], [10.0, 11.1, 12.2]]
-    //     ];
-    //     assert_eq!(data.max().compute(), vec![12.2]);
-    //     assert_eq!(
-    //         data.max().axis(0).compute(),
-    //         vec![7.7, 8.8, 9.9, 10.0, 11.1, 12.2]
-    //     );
-    //     assert_eq!(
-    //         data.max().axis(1).compute(),
-    //         vec![4.4, 5.5, 6.6, 10.0, 11.1, 12.2]
-    //     );
-    //     assert_eq!(data.max().axis(2).compute(), vec![3.3, 6.6, 9.9, 12.2]);
-    // }
+    #[test]
+    fn max_f64_3d() {
+        let data = arr![
+            [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
+            [[7.7, 8.8, 9.9], [10.0, 11.1, 12.2]]
+        ];
+        assert_eq!(data.max().compute(), vec![12.2]);
+        assert_eq!(
+            data.max().axis(0).compute(),
+            vec![7.7, 8.8, 9.9, 10.0, 11.1, 12.2]
+        );
+        assert_eq!(
+            data.max().axis(1).compute(),
+            vec![4.4, 5.5, 6.6, 10.0, 11.1, 12.2]
+        );
+        assert_eq!(data.max().axis(2).compute(), vec![3.3, 6.6, 9.9, 12.2]);
+    }
 }
