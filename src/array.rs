@@ -477,8 +477,8 @@ mod tests {
     #[test]
     fn min_f64_2d() {
         let b = arr![[TAU, -PI, 1.61], [E, 0.98, -7.42], [4.67, -0.45, 8.88]];
-        assert_eq!(b.min().compute(), vec![-PI]);
-        assert_eq!(b.min().axis(0).compute(), vec![TAU, -PI, -7.42]);
+        assert_eq!(b.min().compute(), vec![-7.42]);
+        assert_eq!(b.min().axis(0).compute(), vec![E, -PI, -7.42]);
         assert_eq!(b.min().axis(1).compute(), vec![-PI, -7.42, -0.45]);
     }
 
@@ -513,7 +513,7 @@ mod tests {
         );
         assert_eq!(
             c.min().axis(1).compute(),
-            vec![1.1, 2.2, 3.3, 10.0, 11.1, 12.2]
+            vec![1.1, 2.2, 3.3, 7.7, 8.8, 9.9]
         );
         assert_eq!(c.min().axis(2).compute(), vec![1.1, 4.4, 7.7, 10.0]);
     }
