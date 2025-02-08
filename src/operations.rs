@@ -32,7 +32,7 @@ where
 
     /// Computes the maximum values based on the current configuration.
     pub fn compute(self) -> Vec<T> {
-        self.array.max_compute(self.axis)
+        self.array.max_compute(self.axis).unwrap()
     }
 }
 
@@ -64,7 +64,7 @@ where
 
     /// Computes the minimum values based on the current configuration.
     pub fn compute(self) -> Vec<T> {
-        self.array.min_compute(self.axis)
+        self.array.min_compute(self.axis).unwrap()
     }
 }
 

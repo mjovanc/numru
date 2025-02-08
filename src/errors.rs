@@ -7,8 +7,10 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum ArrayError {
     /// Occurs when the dimensions of data do not match the expected shape.
-    #[error("Dimension mismatch: {0}")]
-    DimensionMismatch(String),
+    /// The error message includes the expected number of elements based on the shape
+    /// and the actual number of elements provided in the data vector.
+    #[error("Dimension mismatch: Expected {expected} elements based on the shape, but the data vector contains {actual} elements")]
+    DimensionMismatch { expected: usize, actual: usize },
 
     /// Raised when an index used to access the array is outside its bounds.
     #[error("Index out of bounds: {0}")]

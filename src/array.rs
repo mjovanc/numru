@@ -1,3 +1,4 @@
+use crate::ArrayError;
 use crate::{Dimension, Shape};
 use std::fmt::Debug;
 use std::fmt::Display;
@@ -12,12 +13,19 @@ pub struct Array<T, D: Dimension> {
 impl<T, D: Dimension> Array<T, D> {
     /// Constructs a new `Array` from a vector of data and a shape.
     ///
-    /// # Panics
+    /// # Errors
     ///
-    /// Panics if the length of `data` does not match the size of `shape`.
-    pub fn new(data: Vec<T>, shape: Shape<D>) -> Self {
-        assert_eq!(data.len(), shape.size(), "Data size must match shape size");
-        Array { data, shape }
+    /// Returns `ArrayError::DimensionMismatch` if the length of `data` does not match the size of `shape`,
+    /// providing details on the expected and actual number of elements.
+    pub fn new(data: Vec<T>, shape: Shape<D>) -> Result<Self, ArrayError> {
+        let expected_size = shape.size();
+        if data.len() != expected_size {
+            return Err(ArrayError::DimensionMismatch {
+                expected: expected_size,
+                actual: data.len(),
+            });
+        }
+        Ok(Array { data, shape })
     }
 
     /// Returns a reference to the underlying data vector.
@@ -51,197 +59,235 @@ where
 {
     /// Computes the maximum value(s) of the array along a specified axis or for the whole array.
     ///
-    /// - If `axis` is `None`, returns a single-element vector with the maximum value of the entire array.
-    /// - If `axis` is provided, returns a vector where each element is the maximum along that axis.
-    pub fn max_compute(&self, axis: Option<usize>) -> Vec<T> {
-        match axis {
-            None => vec![*self
+    /// # Errors
+    ///
+    /// - Returns `ArrayError::EmptyArray` if the array is empty.
+    /// - Returns `ArrayError::InvalidAxis` if the specified axis is out of bounds for the array's dimensions.
+    /// - Returns `ArrayError::UnimplementedDimension` for unsupported dimensions.
+    pub fn max_compute(&self, axis: Option<usize>) -> Result<Vec<T>, ArrayError> {
+        if self.data.is_empty() {
+            return Err(ArrayError::EmptyArray);
+        }
+
+        let raw_dim = self.shape.raw_dim();
+        let ndim = raw_dim.ndim();
+
+        if let Some(axis) = axis {
+            if axis >= ndim {
+                return Err(ArrayError::InvalidAxis(format!(
+                    "Axis {} is out of bounds for array with {} dimensions",
+                    axis, ndim
+                )));
+            }
+        }
+
+        match ndim {
+            1 => Ok(vec![*self
                 .data
                 .iter()
                 .max_by(|a, b| a.partial_cmp(b).unwrap())
-                .expect("Array is empty")],
-            Some(axis) => {
-                let raw_dim = self.shape.raw_dim();
-                let ndim = raw_dim.ndim();
+                .ok_or(ArrayError::EmptyArray)?]),
+            2 => {
+                let rows = raw_dim.dims()[0];
+                let cols = raw_dim.dims()[1];
 
-                assert!(
-                    axis < ndim,
-                    "Axis {} is out of bounds for array with {} dimensions",
-                    axis,
-                    ndim
-                );
-
-                match ndim {
-                    1 => vec![*self
+                if let Some(axis) = axis {
+                    if axis == 0 {
+                        (0..cols)
+                            .map(|col| {
+                                (0..rows)
+                                    .map(|row| self.data[row * cols + col])
+                                    .max_by(|a, b| a.partial_cmp(b).unwrap())
+                                    .ok_or(ArrayError::EmptyArray)
+                            })
+                            .collect::<Result<Vec<T>, _>>()
+                    } else {
+                        (0..rows)
+                            .map(|row| {
+                                self.data[row * cols..(row + 1) * cols]
+                                    .iter()
+                                    .max_by(|a, b| a.partial_cmp(b).unwrap())
+                                    .map(|&v| v)
+                                    .ok_or(ArrayError::EmptyArray)
+                            })
+                            .collect::<Result<Vec<T>, _>>()
+                    }
+                } else {
+                    Ok(vec![*self
                         .data
                         .iter()
                         .max_by(|a, b| a.partial_cmp(b).unwrap())
-                        .expect("Array is empty")],
-                    2 => {
-                        let rows = raw_dim.dims()[0];
-                        let cols = raw_dim.dims()[1];
-
-                        if axis == 0 {
-                            (0..cols)
-                                .map(|col| {
-                                    (0..rows)
-                                        .map(|row| self.data[row * cols + col])
-                                        .max_by(|a, b| a.partial_cmp(b).unwrap())
-                                        .unwrap()
-                                })
-                                .collect()
-                        } else {
-                            (0..rows)
-                                .map(|row| {
-                                    self.data[row * cols..(row + 1) * cols]
-                                        .iter()
-                                        .max_by(|a, b| a.partial_cmp(b).unwrap())
-                                        .unwrap()
-                                        .to_owned()
-                                })
-                                .collect()
-                        }
-                    }
-                    3 => {
-                        let depth = raw_dim.dims()[0];
-                        let rows = raw_dim.dims()[1];
-                        let cols = raw_dim.dims()[2];
-
-                        match axis {
-                            0 => (0..rows * cols)
-                                .map(|i| {
-                                    (0..depth)
-                                        .map(|d| self.data[d * rows * cols + i])
-                                        .max_by(|a, b| a.partial_cmp(b).unwrap())
-                                        .unwrap()
-                                })
-                                .collect(),
-                            1 => (0..depth)
-                                .flat_map(|d| {
-                                    (0..cols).map(move |c| {
-                                        (0..rows)
-                                            .map(|r| self.data[d * rows * cols + r * cols + c])
-                                            .max_by(|a, b| a.partial_cmp(b).unwrap())
-                                            .unwrap()
-                                    })
-                                })
-                                .collect(),
-                            2 => (0..depth)
-                                .flat_map(|d| {
-                                    (0..rows).map(move |r| {
-                                        let row_start = d * rows * cols + r * cols;
-                                        self.data[row_start..row_start + cols]
-                                            .iter()
-                                            .max_by(|a, b| a.partial_cmp(b).unwrap())
-                                            .unwrap()
-                                            .to_owned()
-                                    })
-                                })
-                                .collect(),
-                            _ => unreachable!(),
-                        }
-                    }
-                    _ => unimplemented!(),
+                        .ok_or(ArrayError::EmptyArray)?])
                 }
             }
+            3 => {
+                let depth = raw_dim.dims()[0];
+                let rows = raw_dim.dims()[1];
+                let cols = raw_dim.dims()[2];
+
+                if let Some(axis) = axis {
+                    match axis {
+                        0 => (0..rows * cols)
+                            .map(|i| {
+                                (0..depth)
+                                    .map(|d| self.data[d * rows * cols + i])
+                                    .max_by(|a, b| a.partial_cmp(b).unwrap())
+                                    .ok_or(ArrayError::EmptyArray)
+                            })
+                            .collect::<Result<Vec<T>, _>>(),
+                        1 => (0..depth)
+                            .flat_map(|d| {
+                                (0..cols).map(move |c| {
+                                    (0..rows)
+                                        .map(|r| self.data[d * rows * cols + r * cols + c])
+                                        .max_by(|a, b| a.partial_cmp(b).unwrap())
+                                        .ok_or(ArrayError::EmptyArray)
+                                })
+                            })
+                            .collect::<Result<Vec<T>, _>>(),
+                        2 => (0..depth)
+                            .flat_map(|d| {
+                                (0..rows).map(move |r| {
+                                    let row_start = d * rows * cols + r * cols;
+                                    self.data[row_start..row_start + cols]
+                                        .iter()
+                                        .max_by(|a, b| a.partial_cmp(b).unwrap())
+                                        .map(|&v| v)
+                                        .ok_or(ArrayError::EmptyArray)
+                                })
+                            })
+                            .collect::<Result<Vec<T>, _>>(),
+                        _ => unreachable!(),
+                    }
+                } else {
+                    Ok(vec![*self
+                        .data
+                        .iter()
+                        .max_by(|a, b| a.partial_cmp(b).unwrap())
+                        .ok_or(ArrayError::EmptyArray)?])
+                }
+            }
+            _ => Err(ArrayError::UnimplementedDimension(format!(
+                "Dimension {} for max computation not implemented",
+                ndim
+            ))),
         }
     }
 
     /// Computes the minimum value(s) of the array along a specified axis or for the whole array.
     ///
-    /// - If `axis` is `None`, returns a single-element vector with the minimum value of the entire array.
-    /// - If `axis` is provided, returns a vector where each element is the minimum along that axis.
-    pub fn min_compute(&self, axis: Option<usize>) -> Vec<T> {
-        match axis {
-            None => vec![*self
+    /// # Errors
+    ///
+    /// - Returns `ArrayError::EmptyArray` if the array is empty.
+    /// - Returns `ArrayError::InvalidAxis` if the specified axis is out of bounds for the array's dimensions.
+    /// - Returns `ArrayError::UnimplementedDimension` for unsupported dimensions.
+    pub fn min_compute(&self, axis: Option<usize>) -> Result<Vec<T>, ArrayError> {
+        if self.data.is_empty() {
+            return Err(ArrayError::EmptyArray);
+        }
+
+        let raw_dim = self.shape.raw_dim();
+        let ndim = raw_dim.ndim();
+
+        if let Some(axis) = axis {
+            if axis >= ndim {
+                return Err(ArrayError::InvalidAxis(format!(
+                    "Axis {} is out of bounds for array with {} dimensions",
+                    axis, ndim
+                )));
+            }
+        }
+
+        match ndim {
+            1 => Ok(vec![*self
                 .data
                 .iter()
                 .min_by(|a, b| a.partial_cmp(b).unwrap())
-                .expect("Array is empty")],
-            Some(axis) => {
-                let raw_dim = self.shape.raw_dim();
-                let ndim = raw_dim.ndim();
+                .ok_or(ArrayError::EmptyArray)?]),
+            2 => {
+                let rows = raw_dim.dims()[0];
+                let cols = raw_dim.dims()[1];
 
-                assert!(
-                    axis < ndim,
-                    "Axis {} is out of bounds for array with {} dimensions",
-                    axis,
-                    ndim
-                );
-
-                match ndim {
-                    1 => vec![*self
+                if let Some(axis) = axis {
+                    if axis == 0 {
+                        (0..cols)
+                            .map(|col| {
+                                (0..rows)
+                                    .map(|row| self.data[row * cols + col])
+                                    .min_by(|a, b| a.partial_cmp(b).unwrap())
+                                    .ok_or(ArrayError::EmptyArray)
+                            })
+                            .collect::<Result<Vec<T>, _>>()
+                    } else {
+                        (0..rows)
+                            .map(|row| {
+                                self.data[row * cols..(row + 1) * cols]
+                                    .iter()
+                                    .min_by(|a, b| a.partial_cmp(b).unwrap())
+                                    .map(|&v| v)
+                                    .ok_or(ArrayError::EmptyArray)
+                            })
+                            .collect::<Result<Vec<T>, _>>()
+                    }
+                } else {
+                    Ok(vec![*self
                         .data
                         .iter()
                         .min_by(|a, b| a.partial_cmp(b).unwrap())
-                        .expect("Array is empty")],
-                    2 => {
-                        let rows = raw_dim.dims()[0];
-                        let cols = raw_dim.dims()[1];
-
-                        if axis == 0 {
-                            (0..cols)
-                                .map(|col| {
-                                    (0..rows)
-                                        .map(|row| self.data[row * cols + col])
-                                        .min_by(|a, b| a.partial_cmp(b).unwrap())
-                                        .unwrap()
-                                })
-                                .collect()
-                        } else {
-                            (0..rows)
-                                .map(|row| {
-                                    self.data[row * cols..(row + 1) * cols]
-                                        .iter()
-                                        .min_by(|a, b| a.partial_cmp(b).unwrap())
-                                        .unwrap()
-                                        .to_owned()
-                                })
-                                .collect()
-                        }
-                    }
-                    3 => {
-                        let depth = raw_dim.dims()[0];
-                        let rows = raw_dim.dims()[1];
-                        let cols = raw_dim.dims()[2];
-
-                        match axis {
-                            0 => (0..rows * cols)
-                                .map(|i| {
-                                    (0..depth)
-                                        .map(|d| self.data[d * rows * cols + i])
-                                        .min_by(|a, b| a.partial_cmp(b).unwrap())
-                                        .unwrap()
-                                })
-                                .collect(),
-                            1 => (0..depth)
-                                .flat_map(|d| {
-                                    (0..cols).map(move |c| {
-                                        (0..rows)
-                                            .map(|r| self.data[d * rows * cols + r * cols + c])
-                                            .min_by(|a, b| a.partial_cmp(b).unwrap())
-                                            .unwrap()
-                                    })
-                                })
-                                .collect(),
-                            2 => (0..depth)
-                                .flat_map(|d| {
-                                    (0..rows).map(move |r| {
-                                        let row_start = d * rows * cols + r * cols;
-                                        self.data[row_start..row_start + cols]
-                                            .iter()
-                                            .min_by(|a, b| a.partial_cmp(b).unwrap())
-                                            .unwrap()
-                                            .to_owned()
-                                    })
-                                })
-                                .collect(),
-                            _ => unreachable!(),
-                        }
-                    }
-                    _ => unimplemented!(),
+                        .ok_or(ArrayError::EmptyArray)?])
                 }
             }
+            3 => {
+                let depth = raw_dim.dims()[0];
+                let rows = raw_dim.dims()[1];
+                let cols = raw_dim.dims()[2];
+
+                if let Some(axis) = axis {
+                    match axis {
+                        0 => (0..rows * cols)
+                            .map(|i| {
+                                (0..depth)
+                                    .map(|d| self.data[d * rows * cols + i])
+                                    .min_by(|a, b| a.partial_cmp(b).unwrap())
+                                    .ok_or(ArrayError::EmptyArray)
+                            })
+                            .collect::<Result<Vec<T>, _>>(),
+                        1 => (0..depth)
+                            .flat_map(|d| {
+                                (0..cols).map(move |c| {
+                                    (0..rows)
+                                        .map(|r| self.data[d * rows * cols + r * cols + c])
+                                        .min_by(|a, b| a.partial_cmp(b).unwrap())
+                                        .ok_or(ArrayError::EmptyArray)
+                                })
+                            })
+                            .collect::<Result<Vec<T>, _>>(),
+                        2 => (0..depth)
+                            .flat_map(|d| {
+                                (0..rows).map(move |r| {
+                                    let row_start = d * rows * cols + r * cols;
+                                    self.data[row_start..row_start + cols]
+                                        .iter()
+                                        .min_by(|a, b| a.partial_cmp(b).unwrap())
+                                        .map(|&v| v)
+                                        .ok_or(ArrayError::EmptyArray)
+                                })
+                            })
+                            .collect::<Result<Vec<T>, _>>(),
+                        _ => unreachable!(),
+                    }
+                } else {
+                    Ok(vec![*self
+                        .data
+                        .iter()
+                        .min_by(|a, b| a.partial_cmp(b).unwrap())
+                        .ok_or(ArrayError::EmptyArray)?])
+                }
+            }
+            _ => Err(ArrayError::UnimplementedDimension(format!(
+                "Dimension {} for min computation not implemented",
+                ndim
+            ))),
         }
     }
 }
