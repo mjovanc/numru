@@ -1,4 +1,5 @@
-use crate::shape::{Dimension, Shape};
+use crate::shape::Shape;
+use crate::Dimension;
 use std::fmt;
 use std::fmt::Debug;
 use std::fmt::Display;
@@ -271,10 +272,7 @@ impl<D: Dimension, T: Display> Array<T, D> {
 mod tests {
     use std::f64::consts::PI;
 
-    use crate::{
-        shape::{Dimension, Shape},
-        Ix,
-    };
+    use crate::{Dimension, Ix, Shape};
 
     #[test]
     fn array_creation_i64_1d() {

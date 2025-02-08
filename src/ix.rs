@@ -1,4 +1,4 @@
-use crate::shape::Dimension;
+use crate::Dimension;
 
 /// Fixed-size index type for multi-dimensional arrays.
 ///
