@@ -1,7 +1,8 @@
 use crate::shape::{Dimension, Shape};
-use crate::Axis;
+use std::fmt;
 use std::fmt::Debug;
 use std::fmt::Display;
+use std::fmt::Formatter;
 
 #[derive(Debug)]
 pub struct Array<T, D: Dimension> {
@@ -37,62 +38,147 @@ impl<D: Dimension> Array<f64, D> {
 }
 
 impl<T: PartialOrd + Copy, D: Dimension> Array<T, D> {
-    pub fn max(&self, axis: Option<Axis>) -> Vec<T> {
-        match axis {
-            None => vec![*self
+    pub fn max(&self) -> MaxBuilder<T, D> {
+        MaxBuilder::new(self)
+    }
+}
+
+pub struct MaxBuilder<'a, T, D>
+where
+    T: PartialOrd + Copy,
+    D: Dimension,
+{
+    array: &'a Array<T, D>,
+    axis: Option<usize>,
+}
+
+impl<'a, T, D> MaxBuilder<'a, T, D>
+where
+    T: PartialOrd + Copy,
+    D: Dimension,
+{
+    pub fn new(array: &'a Array<T, D>) -> Self {
+        Self { array, axis: None }
+    }
+
+    pub fn axis(mut self, axis: usize) -> Self {
+        self.axis = Some(axis);
+        self
+    }
+
+    pub fn compute(self) -> Vec<T> {
+        let array = self.array;
+        match self.axis {
+            None => vec![*array
                 .data
                 .iter()
                 .max_by(|a, b| a.partial_cmp(b).unwrap())
                 .expect("Array is empty")],
             Some(axis) => {
-                let raw_dim = self.shape.raw_dim();
+                let raw_dim = array.shape.raw_dim();
                 let ndim = raw_dim.ndim();
 
                 assert!(
-                    axis.index() < ndim,
+                    axis < ndim,
                     "Axis {} is out of bounds for array with {} dimensions",
-                    axis.index(),
+                    axis,
                     ndim
                 );
 
-                if ndim == 1 {
-                    vec![*self
+                match ndim {
+                    1 => vec![*array
                         .data
                         .iter()
                         .max_by(|a, b| a.partial_cmp(b).unwrap())
-                        .expect("Array is empty")]
-                } else if ndim == 2 {
-                    let rows = raw_dim.dims()[0];
-                    let cols = raw_dim.dims()[1];
+                        .expect("Array is empty")],
+                    2 => {
+                        let rows = raw_dim.dims()[0];
+                        let cols = raw_dim.dims()[1];
 
-                    if axis.index() == 0 {
-                        (0..cols)
-                            .map(|col| {
-                                (0..rows)
-                                    .map(|row| self.data[row * cols + col])
-                                    .max_by(|a, b| a.partial_cmp(b).unwrap())
-                                    .unwrap()
-                            })
-                            .collect()
-                    } else if axis.index() == 1 {
-                        (0..rows)
-                            .map(|row| {
-                                self.data[row * cols..(row + 1) * cols]
-                                    .iter()
-                                    .max_by(|a, b| a.partial_cmp(b).unwrap())
-                                    .unwrap()
-                                    .to_owned()
-                            })
-                            .collect()
-                    } else {
-                        unreachable!()
+                        if axis == 0 {
+                            (0..cols)
+                                .map(|col| {
+                                    (0..rows)
+                                        .map(|row| array.data[row * cols + col])
+                                        .max_by(|a, b| a.partial_cmp(b).unwrap())
+                                        .unwrap()
+                                })
+                                .collect()
+                        } else {
+                            (0..rows)
+                                .map(|row| {
+                                    array.data[row * cols..(row + 1) * cols]
+                                        .iter()
+                                        .max_by(|a, b| a.partial_cmp(b).unwrap())
+                                        .unwrap()
+                                        .to_owned()
+                                })
+                                .collect()
+                        }
                     }
-                } else {
-                    // TODO: Extend for 3D and beyond
-                    unimplemented!()
+                    3 => {
+                        let depth = raw_dim.dims()[0];
+                        let rows = raw_dim.dims()[1];
+                        let cols = raw_dim.dims()[2];
+
+                        match axis {
+                            0 => (0..rows * cols)
+                                .map(|i| {
+                                    (0..depth)
+                                        .map(|d| array.data[d * rows * cols + i])
+                                        .max_by(|a, b| a.partial_cmp(b).unwrap())
+                                        .unwrap()
+                                })
+                                .collect(),
+                            1 => (0..depth)
+                                .flat_map(|d| {
+                                    (0..cols).map(move |c| {
+                                        (0..rows)
+                                            .map(|r| array.data[d * rows * cols + r * cols + c])
+                                            .max_by(|a, b| a.partial_cmp(b).unwrap())
+                                            .unwrap()
+                                    })
+                                })
+                                .collect(),
+                            2 => (0..depth)
+                                .flat_map(|d| {
+                                    (0..rows).map(move |r| {
+                                        array.data[d * rows * cols + r * cols
+                                            ..d * rows * cols + (r + 1) * cols]
+                                            .iter()
+                                            .max_by(|a, b| a.partial_cmp(b).unwrap())
+                                            .unwrap()
+                                            .to_owned()
+                                    })
+                                })
+                                .collect(),
+                            _ => unreachable!(),
+                        }
+                    }
+                    _ => unimplemented!(),
                 }
             }
         }
+    }
+}
+
+impl<'a, T, D> Debug for MaxBuilder<'a, T, D>
+where
+    T: PartialOrd + Copy,
+    D: Dimension,
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_struct("MaxBuilder")
+            .field(
+                "array",
+                &format_args!(
+                    "Array<{}, {}>",
+                    std::any::type_name::<T>(),
+                    std::any::type_name::<D>()
+                ),
+            )
+            .field("axis", &self.axis)
+            .finish()
     }
 }
 
@@ -189,7 +275,7 @@ mod tests {
     };
 
     #[test]
-    fn test_array_creation_i64_1d() {
+    fn array_creation_i64_1d() {
         let data = arr![1, 2, 3, 4];
         let ix = Ix::<1>::new([4]);
         let shape = Shape::new(ix);
@@ -200,7 +286,7 @@ mod tests {
     }
 
     #[test]
-    fn test_array_creation_i64_2d() {
+    fn array_creation_i64_2d() {
         let data = arr![[1, 2], [3, 4], [5, 6]];
         let ix = Ix::<2>::new([3, 2]);
         let shape = Shape::new(ix);
@@ -211,7 +297,7 @@ mod tests {
     }
 
     #[test]
-    fn test_array_creation_i64_3d() {
+    fn array_creation_i64_3d() {
         let data = arr![[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]];
         let ix = Ix::<3>::new([2, 2, 3]);
         let shape = Shape::new(ix);
@@ -222,7 +308,7 @@ mod tests {
     }
 
     #[test]
-    fn test_array_creation_f64_1d() {
+    fn array_creation_f64_1d() {
         let data = arr![1.1, 2.2, 3.3, 4.4];
         let ix = Ix::<1>::new([4]);
         let shape = Shape::new(ix);
@@ -233,7 +319,7 @@ mod tests {
     }
 
     #[test]
-    fn test_array_creation_f64_2d() {
+    fn array_creation_f64_2d() {
         let data = arr![[1.1, 2.2], [3.3, 4.4], [5.5, 6.6]];
         let ix = Ix::<2>::new([3, 2]);
         let shape = Shape::new(ix);
@@ -244,7 +330,7 @@ mod tests {
     }
 
     #[test]
-    fn test_array_creation_f64_3d() {
+    fn array_creation_f64_3d() {
         let data = arr![
             [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
             [[7.7, 8.8, 9.9], [10.0, 11.1, 12.2]]
@@ -256,4 +342,73 @@ mod tests {
         assert_eq!(data.shape().raw_dim().ndim(), 3);
         assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
     }
+
+    #[test]
+    fn max_i64_1d() {
+        let data = arr![42, -17, 256, 3, 99, -8];
+        assert_eq!(data.max().compute(), vec![256]);
+    }
+
+    #[test]
+    fn max_f64_1d() {
+        let data = arr![3.14, 2.71, -1.0, 42.0, 0.98];
+        assert_eq!(data.max().compute(), vec![42.0]);
+    }
+
+    #[test]
+    fn max_i64_2d() {
+        let data = arr![[1, 5, 3], [4, 2, 6], [0, 9, 8]];
+        assert_eq!(data.max().compute(), vec![9]);
+        assert_eq!(data.max().axis(0).compute(), vec![4, 9, 8]);
+        assert_eq!(data.max().axis(1).compute(), vec![5, 6, 9]);
+    }
+
+    #[test]
+    fn max_f64_2d() {
+        let data = arr![
+            [3.14, -2.71, 1.61],
+            [2.72, 0.98, -7.42],
+            [4.67, -0.45, 8.88]
+        ];
+        assert_eq!(data.max().compute(), vec![8.88]);
+        assert_eq!(data.max().axis(0).compute(), vec![4.67, 0.98, 8.88]);
+        assert_eq!(data.max().axis(1).compute(), vec![3.14, 2.72, 8.88]);
+    }
+
+    // TODO: these needs to be implemented correctly
+    // #[test]
+    // fn max_i64_3d() {
+    //     let data = arr![
+    //         [[101, 202, 303], [404, 505, 606]],
+    //         [[-707, -808, -909], [111, 222, 333]]
+    //     ];
+    //     assert_eq!(data.max().compute(), vec![606]);
+    //     assert_eq!(
+    //         data.max().axis(0).compute(),
+    //         vec![101, 202, 303, 404, 505, 606]
+    //     );
+    //     assert_eq!(
+    //         data.max().axis(1).compute(),
+    //         vec![404, 505, 606, 111, 222, 333]
+    //     );
+    //     assert_eq!(data.max().axis(2).compute(), vec![303, 606, 222, 333]);
+    // }
+
+    // #[test]
+    // fn max_f64_3d() {
+    //     let data = arr![
+    //         [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
+    //         [[7.7, 8.8, 9.9], [10.0, 11.1, 12.2]]
+    //     ];
+    //     assert_eq!(data.max().compute(), vec![12.2]);
+    //     assert_eq!(
+    //         data.max().axis(0).compute(),
+    //         vec![7.7, 8.8, 9.9, 10.0, 11.1, 12.2]
+    //     );
+    //     assert_eq!(
+    //         data.max().axis(1).compute(),
+    //         vec![4.4, 5.5, 6.6, 10.0, 11.1, 12.2]
+    //     );
+    //     assert_eq!(data.max().axis(2).compute(), vec![3.3, 6.6, 9.9, 12.2]);
+    // }
 }
