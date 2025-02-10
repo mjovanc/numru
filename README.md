@@ -18,12 +18,15 @@ Check the unit tests if you want to stay up to date with how things should be do
 
 ```toml
 [dependencies]
-numru = "0.1.0"
+numru = "0.2.0"
 ```
 
 And a simple code:
 
 ```rust
+use numru::arr;
+use std::f64::consts::{E, PI, TAU};
+
 fn main() {
     let a = arr![42, -17, 256, 3, 99, -8];
     println!("a.shape() = {:?}", a.shape());
