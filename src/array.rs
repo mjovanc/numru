@@ -39,6 +39,23 @@ impl<T, D: Dimension> Array<T, D> {
     }
 }
 
+impl<T: Default + Clone, D: Dimension> Array<T, D> {
+    /// Creates a new array filled with zeros based on the given shape.
+    pub fn zeros_new(shape: Shape<D>) -> Self {
+        let size = shape.size();
+        let data = vec![T::default(); size];
+        Array { data, shape }
+    }
+}
+
+impl<T: Default + Clone, D: Dimension> Array<T, D> {
+    /// Fills the existing array with zeros.
+    pub fn zeros(&mut self) {
+        let size = self.shape.size();
+        self.data = vec![T::default(); size];
+    }
+}
+
 impl<D: Dimension> Array<i64, D> {
     /// Returns the data type string for an array of `i64`.
     pub fn dtype(&self) -> &'static str {

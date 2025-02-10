@@ -1,5 +1,3 @@
-/// Purpose:
-///
 /// The `arr!` macro is designed to accept arrays of depth 1D, 2D and 3D and flatten them into a
 /// single-dimensional vector. It also tracks and stores the shape (dimensions) of the array, which includes
 /// the number of rows, columns, and further dimensions as needed.
@@ -125,5 +123,26 @@ macro_rules! arr {
         let data = vec![$($elem),+];
         let shape = vec![data.len()];
         $crate::Array::new(data, $crate::Shape::new($crate::ix::Ix::<1>::new(shape.try_into().unwrap()))).unwrap()
+    }};
+}
+
+#[macro_export]
+macro_rules! zeros {
+    ($ty:ident, $($dim:expr),+) => {{
+        let shape = vec![$($dim),+];
+        let size = shape.iter().product::<usize>();
+
+        println!("Shape: {:?}", shape);
+        println!("Size: {}", size);
+
+        let data: Vec<$ty> = vec![$ty::default(); size];
+
+        let dimension = shape.len();
+        println!("Dimension: {}", dimension);
+
+        match dimension {
+            1 => $crate::Array::new(data, $crate::Shape::new($crate::ix::Ix::<1>::new(shape.try_into().unwrap()))).unwrap(),
+            _ => panic!("Unsupported number of dimensions"),
+        }
     }};
 }
