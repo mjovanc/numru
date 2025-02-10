@@ -300,6 +300,124 @@ where
             ))),
         }
     }
+
+    /// Computes the mean value(s) of the array along a specified axis or for the whole array.
+    ///
+    /// # Success
+    ///
+    /// - If `axis` is `None`, returns a single-element `Vec<T>` with the mean of the entire array.
+    /// - If `axis` is provided, returns a `Vec<T>` where each element is the mean along that axis.
+    ///
+    /// # Errors
+    ///
+    /// - Returns `ArrayError::EmptyArray` if the array is empty.
+    /// - Returns `ArrayError::InvalidAxis` if the specified axis is out of bounds for the array's dimensions.
+    /// - Returns `ArrayError::UnimplementedDimension` for unsupported dimensions.
+    pub fn mean_compute(&self, axis: Option<usize>) -> Result<Vec<T>, ArrayError> {
+        if self.data.is_empty() {
+            return Err(ArrayError::EmptyArray);
+        }
+
+        let raw_dim = self.shape.raw_dim();
+        let ndim = raw_dim.ndim();
+
+        if let Some(axis) = axis {
+            if axis >= ndim {
+                return Err(ArrayError::InvalidAxis(format!(
+                    "Axis {} is out of bounds for array with {} dimensions",
+                    axis, ndim
+                )));
+            }
+        }
+
+        match ndim {
+            1 => {
+                let mean =
+                    self.data.iter().map(|&v| v.into()).sum::<f64>() / self.data.len() as f64;
+                Ok(vec![T::from(mean)])
+            }
+            2 => {
+                let rows = raw_dim.dims()[0];
+                let cols = raw_dim.dims()[1];
+
+                if let Some(axis) = axis {
+                    if axis == 0 {
+                        (0..cols)
+                            .map(|col| {
+                                let sum: f64 = (0..rows)
+                                    .map(|row| self.data[row * cols + col].into())
+                                    .sum();
+                                T::from(sum / rows as f64)
+                            })
+                            .collect::<Vec<T>>()
+                    } else {
+                        (0..rows)
+                            .map(|row| {
+                                let sum: f64 = self.data[row * cols..(row + 1) * cols]
+                                    .iter()
+                                    .map(|&v| v.into())
+                                    .sum();
+                                T::from(sum / cols as f64)
+                            })
+                            .collect::<Vec<T>>()
+                    }
+                } else {
+                    let mean =
+                        self.data.iter().map(|&v| v.into()).sum::<f64>() / self.data.len() as f64;
+                    Ok(vec![T::from(mean)])
+                }
+            }
+            3 => {
+                let depth = raw_dim.dims()[0];
+                let rows = raw_dim.dims()[1];
+                let cols = raw_dim.dims()[2];
+
+                if let Some(axis) = axis {
+                    match axis {
+                        0 => (0..rows * cols)
+                            .map(|i| {
+                                let sum: f64 = (0..depth)
+                                    .map(|d| self.data[d * rows * cols + i].into())
+                                    .sum();
+                                T::from(sum / depth as f64)
+                            })
+                            .collect::<Vec<T>>(),
+                        1 => (0..depth)
+                            .flat_map(|d| {
+                                (0..cols).map(move |c| {
+                                    let sum: f64 = (0..rows)
+                                        .map(|r| self.data[d * rows * cols + r * cols + c].into())
+                                        .sum();
+                                    T::from(sum / rows as f64)
+                                })
+                            })
+                            .collect::<Vec<T>>(),
+                        2 => (0..depth)
+                            .flat_map(|d| {
+                                (0..rows).map(move |r| {
+                                    let row_start = d * rows * cols + r * cols;
+                                    let sum: f64 = self.data[row_start..row_start + cols]
+                                        .iter()
+                                        .map(|&v| v.into())
+                                        .sum();
+                                    T::from(sum / cols as f64)
+                                })
+                            })
+                            .collect::<Vec<T>>(),
+                        _ => unreachable!(),
+                    }
+                } else {
+                    let mean =
+                        self.data.iter().map(|&v| v.into()).sum::<f64>() / self.data.len() as f64;
+                    Ok(vec![T::from(mean)])
+                }
+            }
+            _ => Err(ArrayError::UnimplementedDimension(format!(
+                "Dimension {} for mean computation not implemented",
+                ndim
+            ))),
+        }
+    }
 }
 
 impl<D: Dimension, T: Display> Array<T, D> {
@@ -596,5 +714,94 @@ mod tests {
             vec![1.1, 2.2, 3.3, 7.7, 8.8, 9.9]
         );
         assert_eq!(c.min().axis(2).compute(), vec![1.1, 4.4, 7.7, 10.0]);
+    }
+
+    #[test]
+    fn mean_i64_1d() {
+        let a = arr![42, -17, 256, 3, 99, -8];
+        assert_eq!(a.mean().compute(), vec![62]);
+        assert_eq!(a.mean().axis(0).compute(), vec![62]);
+    }
+
+    #[test]
+    fn mean_f64_1d() {
+        let a = arr![PI, 2.71, -1.0, 42.0, 0.98];
+        assert_eq!(
+            a.mean().compute(),
+            vec![(PI + 2.71 - 1.0 + 42.0 + 0.98) / 5.0]
+        );
+        assert_eq!(
+            a.mean().axis(0).compute(),
+            vec![(PI + 2.71 - 1.0 + 42.0 + 0.98) / 5.0]
+        );
+    }
+
+    #[test]
+    fn mean_i64_2d() {
+        let b = arr![[1, 5, 3], [4, 2, 6], [0, 9, 8]];
+        assert_eq!(b.mean().compute(), vec![4]);
+        assert_eq!(b.mean().axis(0).compute(), vec![5 / 3, 16 / 3, 17 / 3]);
+        assert_eq!(b.mean().axis(1).compute(), vec![3, 4, 17 / 3]);
+    }
+
+    #[test]
+    fn mean_f64_2d() {
+        let b = arr![[TAU, -PI, 1.61], [E, 0.98, -7.42], [4.67, -0.45, 8.88]];
+        assert_eq!(
+            b.mean().compute(),
+            vec![(TAU - PI + 1.61 + E + 0.98 - 7.42 + 4.67 - 0.45 + 8.88) / 9.0]
+        );
+        assert_eq!(
+            b.mean().axis(0).compute(),
+            vec![
+                (TAU + E + 4.67) / 3.0,
+                (-PI + 0.98 - 0.45) / 3.0,
+                (1.61 - 7.42 + 8.88) / 3.0
+            ]
+        );
+        assert_eq!(
+            b.mean().axis(1).compute(),
+            vec![
+                (TAU - PI + 1.61) / 3.0,
+                (E + 0.98 - 7.42) / 3.0,
+                (4.67 - 0.45 + 8.88) / 3.0
+            ]
+        );
+    }
+
+    #[test]
+    fn mean_i64_3d() {
+        let c = arr![
+            [[101, 202, 303], [404, 505, 606]],
+            [[-707, -808, -909], [111, 222, 333]]
+        ];
+        assert_eq!(c.mean().compute(), vec![5]);
+        assert_eq!(
+            c.mean().axis(0).compute(),
+            vec![-303, -303, -303, 257, 363, 469]
+        );
+        assert_eq!(
+            c.mean().axis(1).compute(),
+            vec![252, 353, 454, -298, -293, -288]
+        );
+        assert_eq!(c.mean().axis(2).compute(), vec![202, 505, -808, 222]);
+    }
+
+    #[test]
+    fn mean_f64_3d() {
+        let c = arr![
+            [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
+            [[7.7, 8.8, 9.9], [10.0, 11.1, 12.2]]
+        ];
+        assert_eq!(c.mean().compute(), vec![6.05]);
+        assert_eq!(
+            c.mean().axis(0).compute(),
+            vec![4.4, 5.5, 6.6, 7.2, 8.3, 9.4]
+        );
+        assert_eq!(
+            c.mean().axis(1).compute(),
+            vec![2.75, 3.85, 4.95, 8.85, 9.95, 11.05]
+        );
+        assert_eq!(c.mean().axis(2).compute(), vec![2.2, 5.5, 8.8, 11.1]);
     }
 }
