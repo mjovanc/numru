@@ -95,7 +95,7 @@ Note that currently we only show the numru equivalents as the ones that are plan
 | Operation            | NumPy Equivalent                     | Numru Equivalent             |
 |----------------------|-------------------------------------|---------------------------------|
 | Create Array         | `np.array([1, 2, 3])` | `arr![1, 2, 3]` |
-| Zeros Array         | `np.zeros((3, 3, 3))`                  | 🚧            |
+| Zeros Array         | `np.zeros((3, 3, 3))`                  | `zeros!(f64, 6)` or `a.zeros()`            |
 | Ones Array          | `np.ones((3, 3, 3))`                   | 🚧             |
 | Arange             | `np.arange(start, stop, step)`      | 🚧 |
 | Linspace           | `np.linspace(start, stop, num)`     | 🚧 |
