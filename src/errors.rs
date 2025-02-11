@@ -32,3 +32,14 @@ pub enum ArrayError {
     #[error("Unimplemented dimension: {0}")]
     UnimplementedDimension(String),
 }
+
+/// Custom error types for visualization operations.
+///
+/// This enum encapsulates various error conditions that can occur during visualization,
+/// providing specific error types for better error handling and debugging.
+#[derive(Debug, Error)]
+pub enum VisualizeError {
+    /// Occurs when the precision (number of decimal points) is invalid or unreasonable.
+    #[error("Invalid precision: {0}")]
+    InvalidPrecision(String),
+}

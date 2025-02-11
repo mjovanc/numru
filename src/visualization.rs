@@ -1,23 +1,29 @@
-use crate::{Array, Dimension};
+use crate::{errors::VisualizeError, Array, Dimension};
 use std::fmt::Display;
 
 /// Trait for formatting values based on their type.
 pub trait FormatValue {
     /// Formats the value as a string, taking into account the type's specific formatting rules.
     /// The `precision` parameter specifies the number of decimal points for floating-point values.
-    fn format_value(&self, precision: usize) -> String;
+    fn format_value(&self, precision: usize) -> Result<String, VisualizeError>;
 }
 
 impl FormatValue for i64 {
-    fn format_value(&self, _precision: usize) -> String {
-        format!("{}", self) // Ignore precision for i64
+    fn format_value(&self, _precision: usize) -> Result<String, VisualizeError> {
+        Ok(format!("{}", self))
     }
 }
 
 impl FormatValue for f64 {
-    fn format_value(&self, precision: usize) -> String {
-        // Ensure the specified number of decimal places for f64
-        format!("{:.precision$}", self, precision = precision)
+    fn format_value(&self, precision: usize) -> Result<String, VisualizeError> {
+        // Validate precision to prevent unreasonable values
+        if precision > 1000 {
+            return Err(VisualizeError::InvalidPrecision(format!(
+                "Precision {} is too large (maximum allowed is 1000)",
+                precision
+            )));
+        }
+        Ok(format!("{:.precision$}", self, precision = precision))
     }
 }
 
@@ -55,7 +61,7 @@ impl<'a, T: Display + FormatValue, D: Dimension> VisualizeBuilder<'a, T, D> {
             for i in 0..rows {
                 let value = &self.array.data()[i];
                 let value_str = value.format_value(self.decimal_points);
-                print!("{}", value_str);
+                print!("{}", value_str.unwrap());
                 if i < rows - 1 {
                     print!(", ");
                 }
@@ -69,7 +75,7 @@ impl<'a, T: Display + FormatValue, D: Dimension> VisualizeBuilder<'a, T, D> {
             for i in 0..rows {
                 for j in 0..cols {
                     let value = &self.array.data()[i * cols + j];
-                    let width = value.format_value(self.decimal_points).len();
+                    let width = value.format_value(self.decimal_points).unwrap().len();
                     column_widths[j] = column_widths[j].max(width);
                 }
             }
@@ -80,7 +86,7 @@ impl<'a, T: Display + FormatValue, D: Dimension> VisualizeBuilder<'a, T, D> {
                 for j in 0..cols {
                     let value = &self.array.data()[i * cols + j];
                     let value_str = value.format_value(self.decimal_points);
-                    print!("{:width$}", value_str, width = column_widths[j]);
+                    print!("{:width$}", value_str.unwrap(), width = column_widths[j]);
                     if j < cols - 1 {
                         print!(", ");
                     }
@@ -98,7 +104,7 @@ impl<'a, T: Display + FormatValue, D: Dimension> VisualizeBuilder<'a, T, D> {
                 for j in 0..rows {
                     for k in 0..cols {
                         let value = &self.array.data()[(i * rows * cols) + (j * cols) + k];
-                        let width = value.format_value(self.decimal_points).len();
+                        let width = value.format_value(self.decimal_points).unwrap().len();
                         column_widths[k] = column_widths[k].max(width);
                     }
                 }
@@ -112,7 +118,7 @@ impl<'a, T: Display + FormatValue, D: Dimension> VisualizeBuilder<'a, T, D> {
                     for k in 0..cols {
                         let value = &self.array.data()[(i * rows * cols) + (j * cols) + k];
                         let value_str = value.format_value(self.decimal_points);
-                        print!("{:width$}", value_str, width = column_widths[k]);
+                        print!("{:width$}", value_str.unwrap(), width = column_widths[k]);
                         if k < cols - 1 {
                             print!(", ");
                         }
