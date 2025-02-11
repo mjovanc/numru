@@ -128,20 +128,25 @@ macro_rules! arr {
 
 #[macro_export]
 macro_rules! zeros {
-    ($ty:ident, $($dim:expr),+) => {{
+    ($ty:ty, $($dim:expr),+) => {{
         let shape = vec![$($dim),+];
         let size = shape.iter().product::<usize>();
 
         println!("Shape: {:?}", shape);
         println!("Size: {}", size);
 
-        let data: Vec<$ty> = vec![$ty::default(); size];
+        let zero_value: $ty = <$ty as Default>::default();
+        let data: Vec<$ty> = vec![zero_value; size];
 
         let dimension = shape.len();
         println!("Dimension: {}", dimension);
 
         match dimension {
-            1 => $crate::Array::new(data, $crate::Shape::new($crate::ix::Ix::<1>::new(shape.try_into().unwrap()))).unwrap(),
+            1 => {
+                let shape = $crate::Shape::new($crate::ix::Ix::<1>::new(shape.try_into().unwrap()));
+                let array: $crate::Array<$ty, _> = $crate::Array::new(data, shape).unwrap();
+                array
+            }
             _ => panic!("Unsupported number of dimensions"),
         }
     }};

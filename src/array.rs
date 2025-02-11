@@ -1,7 +1,6 @@
 use crate::ArrayError;
 use crate::{Dimension, Shape};
 use std::fmt::Debug;
-use std::fmt::Display;
 
 /// Represents a multi-dimensional array with elements of type `T` and dimension `D`.
 #[derive(Debug)]
@@ -36,23 +35,6 @@ impl<T, D: Dimension> Array<T, D> {
     /// Returns a reference to the shape of the array.
     pub fn shape(&self) -> &Shape<D> {
         &self.shape
-    }
-}
-
-impl<T: Default + Clone, D: Dimension> Array<T, D> {
-    /// Creates a new array filled with zeros based on the given shape.
-    pub fn zeros_new(shape: Shape<D>) -> Self {
-        let size = shape.size();
-        let data = vec![T::default(); size];
-        Array { data, shape }
-    }
-}
-
-impl<T: Default + Clone, D: Dimension> Array<T, D> {
-    /// Fills the existing array with zeros.
-    pub fn zeros(&mut self) {
-        let size = self.shape.size();
-        self.data = vec![T::default(); size];
     }
 }
 
@@ -315,97 +297,6 @@ where
                 "Dimension {} for min computation not implemented",
                 ndim
             ))),
-        }
-    }
-}
-
-impl<D: Dimension, T: Display> Array<T, D> {
-    /// Visualizes the array by printing it in a formatted way according to its dimension:
-    ///
-    /// - 1D: Prints as a single line vector.
-    /// - 2D: Prints as a matrix with aligned columns.
-    /// - 3D: Prints each 2D slice within a 3D structure.
-    /// - Higher dimensions are not yet supported and will print an error message.
-    pub fn visualize(&self) {
-        let dims = self.shape.dims();
-        let ndim = dims.len();
-
-        if ndim == 1 {
-            let rows = dims[0];
-            print!("[");
-            for i in 0..rows {
-                let value = &self.data[i];
-                let value_str = format!("{}", value);
-                print!("{}", value_str);
-                if i < rows - 1 {
-                    print!(", ");
-                }
-            }
-            println!("]");
-        } else if ndim == 2 {
-            let rows = dims[0];
-            let cols = dims[1];
-
-            let mut column_widths = vec![0; cols];
-            for i in 0..rows {
-                for j in 0..cols {
-                    let value = &self.data[i * cols + j];
-                    let width = format!("{}", value).len();
-                    column_widths[j] = column_widths[j].max(width);
-                }
-            }
-
-            println!("[");
-            for i in 0..rows {
-                print!("   [");
-                for j in 0..cols {
-                    let value = &self.data[i * cols + j];
-                    let value_str = format!("{}", value);
-                    print!("{:width$}", value_str, width = column_widths[j]);
-                    if j < cols - 1 {
-                        print!(", ");
-                    }
-                }
-                println!("]");
-            }
-            println!("]");
-        } else if ndim == 3 {
-            let depth = dims[0];
-            let rows = dims[1];
-            let cols = dims[2];
-
-            let mut column_widths = vec![0; cols];
-            for i in 0..depth {
-                for j in 0..rows {
-                    for k in 0..cols {
-                        let value = &self.data[(i * rows * cols) + (j * cols) + k];
-                        let width = format!("{}", value).len();
-                        column_widths[k] = column_widths[k].max(width);
-                    }
-                }
-            }
-
-            println!("[");
-            for i in 0..depth {
-                println!("   [");
-                for j in 0..rows {
-                    print!("      [");
-                    for k in 0..cols {
-                        let value = &self.data[(i * rows * cols) + (j * cols) + k];
-                        let value_str = format!("{}", value);
-                        print!("{:width$}", value_str, width = column_widths[k]);
-                        if k < cols - 1 {
-                            print!(", ");
-                        }
-                    }
-                    println!("]");
-                }
-                println!("   ]");
-            }
-            println!("]");
-        } else {
-            // Handle higher dimensions (4D, 5D, etc.) in the future if needed
-            println!("Unsupported dimension: {}", ndim);
         }
     }
 }

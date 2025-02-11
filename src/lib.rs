@@ -6,6 +6,7 @@ pub mod errors;
 pub mod ix;
 pub mod operations;
 pub mod shape;
+pub mod visualization;
 
 pub use array::Array;
 pub use dimension::Dimension;
