@@ -1,5 +1,3 @@
-use num_traits::One;
-
 /// The `arr!` macro is designed to accept arrays of depth 1D, 2D and 3D and flatten them into a
 /// single-dimensional vector. It also tracks and stores the shape (dimensions) of the array, which includes
 /// the number of rows, columns, and further dimensions as needed.
@@ -106,33 +104,36 @@ macro_rules! zeros {
 #[macro_export]
 macro_rules! ones {
     ($ty:ty, $dim:expr) => {{
+        use ::num_traits::One;
         let shape = vec![$dim];
         let size = shape.iter().product::<usize>();
 
-        let zero_value: $ty = <$ty as Default>::default();
-        let data: Vec<$ty> = vec![zero_value; size];
+        let one_value: $ty = <$ty as One>::one();
+        let data: Vec<$ty> = vec![one_value; size];
 
         let shape = $crate::Shape::new($crate::ix::Ix::<1>::new(shape.try_into().unwrap()));
         $crate::Array::new(data, shape).unwrap()
     }};
 
     ($ty:ty, $dim1:expr, $dim2:expr) => {{
+        use ::num_traits::One;
         let shape = vec![$dim1, $dim2];
         let size = shape.iter().product::<usize>();
 
-        let zero_value: $ty = <$ty as Default>::default();
-        let data: Vec<$ty> = vec![zero_value; size];
+        let one_value: $ty = <$ty as One>::one();
+        let data: Vec<$ty> = vec![one_value; size];
 
         let shape = $crate::Shape::new($crate::ix::Ix::<2>::new(shape.try_into().unwrap()));
         $crate::Array::new(data, shape).unwrap()
     }};
 
     ($ty:ty, $dim1:expr, $dim2:expr, $dim3:expr) => {{
+        use ::num_traits::One;
         let shape = vec![$dim1, $dim2, $dim3];
         let size = shape.iter().product::<usize>();
 
-        let zero_value: $ty = <$ty as Default>::default();
-        let data: Vec<$ty> = vec![zero_value; size];
+        let one_value: $ty = <$ty as One>::one();
+        let data: Vec<$ty> = vec![one_value; size];
 
         let shape = $crate::Shape::new($crate::ix::Ix::<3>::new(shape.try_into().unwrap()));
         $crate::Array::new(data, shape).unwrap()

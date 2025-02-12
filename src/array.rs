@@ -1,3 +1,5 @@
+use num_traits::{One, Zero};
+
 use crate::ArrayError;
 use crate::{Dimension, Shape};
 use std::fmt::Debug;
@@ -33,12 +35,19 @@ impl<T, D: Dimension> Array<T, D> {
     }
 }
 
-impl<T: Default + Copy, D: Dimension> Array<T, D> {
-    /// Replaces all elements in the array with zeros (default values) of type T.
+impl<T: Zero + One + Copy, D: Dimension> Array<T, D> {
+    /// Replaces all elements in the array with zeros using num_traits::Zero.
     /// The shape and dimension of the array are preserved.
     pub fn zeros(&mut self) {
-        let zero = T::default();
+        let zero = T::zero(); // Use Zero::zero() instead of T::default()
         self.data.iter_mut().for_each(|x| *x = zero);
+    }
+
+    /// Replaces all elements in the array with ones using num_traits::One.
+    /// The shape and dimension of the array are preserved.
+    pub fn ones(&mut self) {
+        let one = T::one(); // Use One::one() to get the one value
+        self.data.iter_mut().for_each(|x| *x = one);
     }
 }
 
