@@ -1,6 +1,6 @@
 use std::f64::consts::{E, PI, TAU};
 
-use numru::{arr, ones, zeros};
+use numru::{arr, ones};
 
 fn main() {
     let a = ones!(i64, 3);
