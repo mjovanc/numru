@@ -11,11 +11,6 @@ pub struct Array<T, D: Dimension> {
 
 impl<T, D: Dimension> Array<T, D> {
     /// Constructs a new `Array` from a vector of data and a shape.
-    ///
-    /// # Errors
-    ///
-    /// Returns `ArrayError::DimensionMismatch` if the length of `data` does not match the size of `shape`,
-    /// providing details on the expected and actual number of elements.
     pub fn new(data: Vec<T>, shape: Shape<D>) -> Result<Self, ArrayError> {
         let expected_size = shape.size();
         if data.len() != expected_size {
@@ -66,17 +61,6 @@ where
     T: PartialOrd + Copy,
 {
     /// Computes the maximum value(s) of the array along a specified axis or for the whole array.
-    ///
-    /// # Success
-    ///
-    /// - If `axis` is `None`, returns a single-element `Vec<T>` with the maximum value of the entire array.
-    /// - If `axis` is provided, returns a `Vec<T>` where each element is the maximum along that axis.
-    ///
-    /// # Errors
-    ///
-    /// - Returns `ArrayError::EmptyArray` if the array is empty.
-    /// - Returns `ArrayError::InvalidAxis` if the specified axis is out of bounds for the array's dimensions.
-    /// - Returns `ArrayError::UnimplementedDimension` for unsupported dimensions.
     pub fn max_compute(&self, axis: Option<usize>) -> Result<Vec<T>, ArrayError> {
         if self.data.is_empty() {
             return Err(ArrayError::EmptyArray);
@@ -188,17 +172,6 @@ where
     }
 
     /// Computes the minimum value(s) of the array along a specified axis or for the whole array.
-    ///
-    /// # Success
-    ///
-    /// - If `axis` is `None`, returns a single-element `Vec<T>` with the minimum value of the entire array.
-    /// - If `axis` is provided, returns a `Vec<T>` where each element is the minimum along that axis.
-    ///
-    /// # Errors
-    ///
-    /// - Returns `ArrayError::EmptyArray` if the array is empty.
-    /// - Returns `ArrayError::InvalidAxis` if the specified axis is out of bounds for the array's dimensions.
-    /// - Returns `ArrayError::UnimplementedDimension` for unsupported dimensions.
     pub fn min_compute(&self, axis: Option<usize>) -> Result<Vec<T>, ArrayError> {
         if self.data.is_empty() {
             return Err(ArrayError::EmptyArray);
