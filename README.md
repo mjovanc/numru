@@ -118,7 +118,7 @@ These utility features help with visualization, debugging, array exploration and
 
 | **Feature**              | **Type**               | **Numru**                                      | **Description**                                      |
 |----------------------|-------------------|--------------------------------------------|--------------------------------------------------|
-| Visualization    | Display & Debug   | `a.visualize().execute()`                 | Print an array in a human-readable format       |
+| Visualization    | Visualization   | `a.visualize().execute()`                 | Print an array in a human-readable format       |
 | Shape Inspection | Introspection     | `a.shape()`                               | Get the shape of the array                      |
 | Data Type Check  | Introspection     | `a.dtype()`                            | Retrieve the data type of the array             |
 
