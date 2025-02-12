@@ -1,4 +1,6 @@
-use numru::zeros;
+use std::f64::consts::{E, PI, TAU};
+
+use numru::{arr, zeros};
 
 fn main() {
     let a = zeros!(i64, 3);
@@ -13,7 +15,13 @@ fn main() {
     println!("c.shape() = {:?}", c.shape());
     c.visualize().decimal_points(2).execute();
 
-    let d = zeros!(i64, 2, 3, 4);
+    let mut d = arr![[TAU, -PI, 1.61], [E, 0.98, -7.42], [4.67, -0.45, 8.88]];
+    d.zeros();
     println!("d.shape() = {:?}", d.shape());
     d.visualize().execute();
+
+    let mut e = arr![[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+    e.zeros();
+    println!("e.shape() = {:?}", e.shape());
+    e.visualize().execute();
 }

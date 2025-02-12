@@ -38,6 +38,15 @@ impl<T, D: Dimension> Array<T, D> {
     }
 }
 
+impl<T: Default + Copy, D: Dimension> Array<T, D> {
+    /// Replaces all elements in the array with zeros (default values) of type T.
+    /// The shape and dimension of the array are preserved.
+    pub fn zeros(&mut self) {
+        let zero = T::default();
+        self.data.iter_mut().for_each(|x| *x = zero);
+    }
+}
+
 impl<D: Dimension> Array<i64, D> {
     /// Returns the data type string for an array of `i64`.
     pub fn dtype(&self) -> &'static str {
