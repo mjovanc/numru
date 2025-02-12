@@ -128,26 +128,42 @@ macro_rules! arr {
 
 #[macro_export]
 macro_rules! zeros {
-    ($ty:ty, $($dim:expr),+) => {{
-        let shape = vec![$($dim),+];
+    ($ty:ty, $dim:expr) => {{
+        let shape = vec![$dim];
         let size = shape.iter().product::<usize>();
-
-        println!("Shape: {:?}", shape);
-        println!("Size: {}", size);
 
         let zero_value: $ty = <$ty as Default>::default();
         let data: Vec<$ty> = vec![zero_value; size];
 
-        let dimension = shape.len();
-        println!("Dimension: {}", dimension);
+        let shape = $crate::Shape::new($crate::ix::Ix::<1>::new(shape.try_into().unwrap()));
+        $crate::Array::new(data, shape).unwrap()
+    }};
 
-        match dimension {
-            1 => {
-                let shape = $crate::Shape::new($crate::ix::Ix::<1>::new(shape.try_into().unwrap()));
-                let array: $crate::Array<$ty, _> = $crate::Array::new(data, shape).unwrap();
-                array
-            }
-            _ => panic!("Unsupported number of dimensions"),
-        }
+    ($ty:ty, $dim1:expr, $dim2:expr) => {{
+        let shape = vec![$dim1, $dim2];
+        let size = shape.iter().product::<usize>();
+
+        let zero_value: $ty = <$ty as Default>::default();
+        let data: Vec<$ty> = vec![zero_value; size];
+
+        let shape = $crate::Shape::new($crate::ix::Ix::<2>::new(shape.try_into().unwrap()));
+        $crate::Array::new(data, shape).unwrap()
+    }};
+
+    ($ty:ty, $dim1:expr, $dim2:expr, $dim3:expr) => {{
+        let shape = vec![$dim1, $dim2, $dim3];
+        let size = shape.iter().product::<usize>();
+
+        let zero_value: $ty = <$ty as Default>::default();
+        let data: Vec<$ty> = vec![zero_value; size];
+
+        let shape = $crate::Shape::new($crate::ix::Ix::<3>::new(shape.try_into().unwrap()));
+        $crate::Array::new(data, shape).unwrap()
+    }};
+
+    ($ty:ty, $($dim:expr),+) => {{
+        let shape = vec![$($dim),+];
+        let dimension = shape.len();
+        panic!("Unsupported number of dimensions (only 1D, 2D, and 3D are supported): {}", dimension);
     }};
 }
