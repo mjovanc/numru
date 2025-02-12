@@ -9,7 +9,7 @@ pub mod shape;
 pub mod visualization;
 
 pub use array::Array;
-pub use dimension::Dimension;
+pub use dimension::{Dimension, DimensionType};
 pub use errors::ArrayError;
 pub use ix::Ix;
 pub use shape::Shape;

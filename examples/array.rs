@@ -1,4 +1,5 @@
 use numru::arr;
+use numru::DimensionType::D2;
 use std::f64::consts::{E, PI, TAU};
 
 fn main() {
@@ -16,4 +17,9 @@ fn main() {
     ];
     println!("\nc.shape() = {:?}", c.shape());
     c.visualize().execute();
+
+    let existing_2d = vec![vec![1, 2, 3], vec![4, 5, 6]];
+    let d = arr!(D2, existing_2d);
+    println!("\nd.shape() = {:?}", d.shape());
+    d.visualize().execute();
 }

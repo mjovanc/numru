@@ -51,6 +51,57 @@ macro_rules! arr {
         let shape = vec![data.len()];
         $crate::Array::new(data, $crate::Shape::new($crate::ix::Ix::<1>::new(shape.try_into().unwrap()))).unwrap()
     }};
+
+    (D1, $vec:expr) => {{
+        fn get_shape_1d<T>(vec: &Vec<T>) -> Vec<usize> {
+            vec![vec.len()]
+        }
+
+        let data = $vec.clone();
+        let shape = get_shape_1d(&data);
+        $crate::Array::new(data, $crate::Shape::new($crate::ix::Ix::<1>::new(shape.try_into().unwrap()))).unwrap()
+    }};
+
+    // New branch for 2D vector with explicit dimensionality
+    (D2, $vec:expr) => {{
+        fn flatten<T: Clone>(nested: &Vec<Vec<T>>) -> Vec<T> {
+            nested.iter().flat_map(|inner| inner.clone()).collect()
+        }
+
+        fn get_shape<T>(nested: &Vec<Vec<T>>) -> Vec<usize> {
+            let mut shape = vec![nested.len()];
+            if let Some(first) = nested.first() {
+                shape.push(first.len());
+            }
+            shape
+        }
+
+        let data = flatten(&$vec);
+        let shape = get_shape(&$vec);
+        $crate::Array::new(data, $crate::Shape::new($crate::ix::Ix::<2>::new(shape.try_into().unwrap()))).unwrap()
+    }};
+
+    // New branch for 3D vector with explicit dimensionality
+    (D3, $vec:expr) => {{
+        fn flatten_3d<T: Clone>(nested: &Vec<Vec<Vec<T>>>) -> Vec<T> {
+            nested.iter().flat_map(|inner| inner.iter().flat_map(|v| v.clone())).collect()
+        }
+
+        fn get_shape_3d<T>(nested: &Vec<Vec<Vec<T>>>) -> Vec<usize> {
+            let mut shape = vec![nested.len()];
+            if let Some(first) = nested.first() {
+                shape.push(first.len());
+                if let Some(second) = first.first() {
+                    shape.push(second.len());
+                }
+            }
+            shape
+        }
+
+        let data = flatten_3d(&$vec);
+        let shape = get_shape_3d(&$vec);
+        $crate::Array::new(data, $crate::Shape::new($crate::ix::Ix::<3>::new(shape.try_into().unwrap()))).unwrap()
+    }};
 }
 
 /// The `zeros!` macro creates a multi-dimensional array filled with zeros of the specified data type,

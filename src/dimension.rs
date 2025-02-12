@@ -12,3 +12,11 @@ pub trait Dimension {
     /// Returns a slice of the dimensions.
     fn dims(&self) -> &[usize];
 }
+
+// Enum to specify the dimensionality of an array when creating it from a vector.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DimensionType {
+    D1,
+    D2,
+    D3,
+}
