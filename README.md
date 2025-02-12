@@ -98,7 +98,7 @@ Note that currently we only show the numru equivalents as the ones that are plan
 |--------------------|-------------------|-----------------------------|------------------------------|
 | Create Array   | Array Creation    | `np.array([1, 2, 3])`       | `arr![1, 2, 3]`             |
 | Zeros Array    | Array Creation    | `np.zeros((3,3))`           | `zeros!(i64, 3, 3)`         |
-| Ones Array     | Array Creation    | `np.ones((3,3))`            | `zeros!(i64, 3, 3)`                           |
+| Ones Array     | Array Creation    | `np.ones((3,3))`            | `ones!(i64, 3, 3)`                           |
 | Arange         | Array Creation    | `np.arange(start, stop, step)` | 🚧                       |
 | Linspace       | Array Creation    | `np.linspace(start, stop, num)` | 🚧                      |
 | Mean          | Reduction         | `np.mean(a)`                | 🚧        |
