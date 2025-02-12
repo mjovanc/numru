@@ -318,200 +318,365 @@ mod tests {
 
     #[test]
     fn array_creation_i64_1d() {
-        let data = arr![1, 2, 3, 4];
+        let arr = arr![1, 2, 3, 4];
         let ix = Ix::<1>::new([4]);
         let shape = Shape::new(ix);
 
-        assert_eq!(data.shape().raw_dim().size(), 4);
-        assert_eq!(data.shape().raw_dim().ndim(), 1);
-        assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
+        assert_eq!(arr.shape().raw_dim().size(), 4);
+        assert_eq!(arr.shape().raw_dim().ndim(), 1);
+        assert_eq!(format!("{:?}", arr.shape()), format!("{:?}", shape));
     }
 
     #[test]
     fn array_creation_i64_2d() {
-        let data = arr![[1, 2], [3, 4], [5, 6]];
+        let arr = arr![[1, 2], [3, 4], [5, 6]];
         let ix = Ix::<2>::new([3, 2]);
         let shape = Shape::new(ix);
 
-        assert_eq!(data.shape().raw_dim().size(), 6);
-        assert_eq!(data.shape().raw_dim().ndim(), 2);
-        assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
+        assert_eq!(arr.shape().raw_dim().size(), 6);
+        assert_eq!(arr.shape().raw_dim().ndim(), 2);
+        assert_eq!(format!("{:?}", arr.shape()), format!("{:?}", shape));
     }
 
     #[test]
     fn array_creation_i64_3d() {
-        let data = arr![[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]];
+        let arr = arr![[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]];
         let ix = Ix::<3>::new([2, 2, 3]);
         let shape = Shape::new(ix);
 
-        assert_eq!(data.shape().raw_dim().size(), 12);
-        assert_eq!(data.shape().raw_dim().ndim(), 3);
-        assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
+        assert_eq!(arr.shape().raw_dim().size(), 12);
+        assert_eq!(arr.shape().raw_dim().ndim(), 3);
+        assert_eq!(format!("{:?}", arr.shape()), format!("{:?}", shape));
     }
 
     #[test]
     fn array_creation_f64_1d() {
-        let data = arr![1.1, 2.2, 3.3, 4.4];
+        let arr = arr![1.1, 2.2, 3.3, 4.4];
         let ix = Ix::<1>::new([4]);
         let shape = Shape::new(ix);
 
-        assert_eq!(data.shape().raw_dim().size(), 4);
-        assert_eq!(data.shape().raw_dim().ndim(), 1);
-        assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
+        assert_eq!(arr.shape().raw_dim().size(), 4);
+        assert_eq!(arr.shape().raw_dim().ndim(), 1);
+        assert_eq!(format!("{:?}", arr.shape()), format!("{:?}", shape));
     }
 
     #[test]
     fn array_creation_f64_2d() {
-        let data = arr![[1.1, 2.2], [3.3, 4.4], [5.5, 6.6]];
+        let arr = arr![[1.1, 2.2], [3.3, 4.4], [5.5, 6.6]];
         let ix = Ix::<2>::new([3, 2]);
         let shape = Shape::new(ix);
 
-        assert_eq!(data.shape().raw_dim().size(), 6);
-        assert_eq!(data.shape().raw_dim().ndim(), 2);
-        assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
+        assert_eq!(arr.shape().raw_dim().size(), 6);
+        assert_eq!(arr.shape().raw_dim().ndim(), 2);
+        assert_eq!(format!("{:?}", arr.shape()), format!("{:?}", shape));
     }
 
     #[test]
     fn array_creation_f64_3d() {
-        let data = arr![
+        let arr = arr![
             [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
             [[7.7, 8.8, 9.9], [10.0, 11.1, 12.2]]
         ];
         let ix = Ix::<3>::new([2, 2, 3]);
         let shape = Shape::new(ix);
 
-        assert_eq!(data.shape().raw_dim().size(), 12);
-        assert_eq!(data.shape().raw_dim().ndim(), 3);
-        assert_eq!(format!("{:?}", data.shape()), format!("{:?}", shape));
+        assert_eq!(arr.shape().raw_dim().size(), 12);
+        assert_eq!(arr.shape().raw_dim().ndim(), 3);
+        assert_eq!(format!("{:?}", arr.shape()), format!("{:?}", shape));
     }
 
     #[test]
     fn max_i64_1d() {
-        let data = arr![42, -17, 256, 3, 99, -8];
-        assert_eq!(data.max().compute(), vec![256]);
+        let arr = arr![42, -17, 256, 3, 99, -8];
+        assert_eq!(arr.max().compute(), vec![256]);
     }
 
     #[test]
     fn max_f64_1d() {
-        let data = arr![PI, 2.71, -1.0, 42.0, 0.98];
-        assert_eq!(data.max().compute(), vec![42.0]);
+        let arr = arr![PI, 2.71, -1.0, 42.0, 0.98];
+        assert_eq!(arr.max().compute(), vec![42.0]);
     }
 
     #[test]
     fn max_i64_2d() {
-        let data = arr![[1, 5, 3], [4, 2, 6], [0, 9, 8]];
-        assert_eq!(data.max().compute(), vec![9]);
-        assert_eq!(data.max().axis(0).compute(), vec![4, 9, 8]);
-        assert_eq!(data.max().axis(1).compute(), vec![5, 6, 9]);
+        let arr = arr![[1, 5, 3], [4, 2, 6], [0, 9, 8]];
+        assert_eq!(arr.max().compute(), vec![9]);
+        assert_eq!(arr.max().axis(0).compute(), vec![4, 9, 8]);
+        assert_eq!(arr.max().axis(1).compute(), vec![5, 6, 9]);
     }
 
     #[test]
     fn max_f64_2d() {
-        let data = arr![[PI, -2.71, 1.61], [2.72, 0.98, -7.42], [4.67, -0.45, 8.88]];
-        assert_eq!(data.max().compute(), vec![8.88]);
-        assert_eq!(data.max().axis(0).compute(), vec![4.67, 0.98, 8.88]);
-        assert_eq!(data.max().axis(1).compute(), vec![PI, 2.72, 8.88]);
+        let arr = arr![[PI, -2.71, 1.61], [2.72, 0.98, -7.42], [4.67, -0.45, 8.88]];
+        assert_eq!(arr.max().compute(), vec![8.88]);
+        assert_eq!(arr.max().axis(0).compute(), vec![4.67, 0.98, 8.88]);
+        assert_eq!(arr.max().axis(1).compute(), vec![PI, 2.72, 8.88]);
     }
 
     #[test]
     fn max_i64_3d() {
-        let data = arr![
+        let arr = arr![
             [[101, 202, 303], [404, 505, 606]],
             [[-707, -808, -909], [111, 222, 333]]
         ];
-        assert_eq!(data.max().compute(), vec![606]);
+        assert_eq!(arr.max().compute(), vec![606]);
         assert_eq!(
-            data.max().axis(0).compute(),
+            arr.max().axis(0).compute(),
             vec![101, 202, 303, 404, 505, 606]
         );
         assert_eq!(
-            data.max().axis(1).compute(),
+            arr.max().axis(1).compute(),
             vec![404, 505, 606, 111, 222, 333]
         );
-        assert_eq!(data.max().axis(2).compute(), vec![303, 606, -707, 333]);
+        assert_eq!(arr.max().axis(2).compute(), vec![303, 606, -707, 333]);
     }
 
     #[test]
     fn max_f64_3d() {
-        let data = arr![
+        let arr = arr![
             [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
             [[7.7, 8.8, 9.9], [10.0, 11.1, 12.2]]
         ];
-        assert_eq!(data.max().compute(), vec![12.2]);
+        assert_eq!(arr.max().compute(), vec![12.2]);
         assert_eq!(
-            data.max().axis(0).compute(),
+            arr.max().axis(0).compute(),
             vec![7.7, 8.8, 9.9, 10.0, 11.1, 12.2]
         );
         assert_eq!(
-            data.max().axis(1).compute(),
+            arr.max().axis(1).compute(),
             vec![4.4, 5.5, 6.6, 10.0, 11.1, 12.2]
         );
-        assert_eq!(data.max().axis(2).compute(), vec![3.3, 6.6, 9.9, 12.2]);
+        assert_eq!(arr.max().axis(2).compute(), vec![3.3, 6.6, 9.9, 12.2]);
     }
 
     #[test]
     fn min_i64_1d() {
-        let a = arr![42, -17, 256, 3, 99, -8];
-        assert_eq!(a.min().compute(), vec![-17]);
-        assert_eq!(a.min().axis(0).compute(), vec![-17]);
+        let arr = arr![42, -17, 256, 3, 99, -8];
+        assert_eq!(arr.min().compute(), vec![-17]);
+        assert_eq!(arr.min().axis(0).compute(), vec![-17]);
     }
 
     #[test]
     fn min_f64_1d() {
-        let a = arr![PI, 2.71, -1.0, 42.0, 0.98];
-        assert_eq!(a.min().compute(), vec![-1.0]);
-        assert_eq!(a.min().axis(0).compute(), vec![-1.0]);
+        let arr = arr![PI, 2.71, -1.0, 42.0, 0.98];
+        assert_eq!(arr.min().compute(), vec![-1.0]);
+        assert_eq!(arr.min().axis(0).compute(), vec![-1.0]);
     }
 
     #[test]
     fn min_i64_2d() {
-        let b = arr![[1, 5, 3], [4, 2, 6], [0, 9, 8]];
-        assert_eq!(b.min().compute(), vec![0]);
-        assert_eq!(b.min().axis(0).compute(), vec![0, 2, 3]);
-        assert_eq!(b.min().axis(1).compute(), vec![1, 2, 0]);
+        let arr = arr![[1, 5, 3], [4, 2, 6], [0, 9, 8]];
+        assert_eq!(arr.min().compute(), vec![0]);
+        assert_eq!(arr.min().axis(0).compute(), vec![0, 2, 3]);
+        assert_eq!(arr.min().axis(1).compute(), vec![1, 2, 0]);
     }
 
     #[test]
     fn min_f64_2d() {
-        let b = arr![[TAU, -PI, 1.61], [E, 0.98, -7.42], [4.67, -0.45, 8.88]];
-        assert_eq!(b.min().compute(), vec![-7.42]);
-        assert_eq!(b.min().axis(0).compute(), vec![E, -PI, -7.42]);
-        assert_eq!(b.min().axis(1).compute(), vec![-PI, -7.42, -0.45]);
+        let arr = arr![[TAU, -PI, 1.61], [E, 0.98, -7.42], [4.67, -0.45, 8.88]];
+        assert_eq!(arr.min().compute(), vec![-7.42]);
+        assert_eq!(arr.min().axis(0).compute(), vec![E, -PI, -7.42]);
+        assert_eq!(arr.min().axis(1).compute(), vec![-PI, -7.42, -0.45]);
     }
 
     #[test]
     fn min_i64_3d() {
-        let c = arr![
+        let arr = arr![
             [[101, 202, 303], [404, 505, 606]],
             [[-707, -808, -909], [111, 222, 333]]
         ];
-        assert_eq!(c.min().compute(), vec![-909]);
+        assert_eq!(arr.min().compute(), vec![-909]);
         assert_eq!(
-            c.min().axis(0).compute(),
+            arr.min().axis(0).compute(),
             vec![-707, -808, -909, 111, 222, 333]
         );
         assert_eq!(
-            c.min().axis(1).compute(),
+            arr.min().axis(1).compute(),
             vec![101, 202, 303, -707, -808, -909]
         );
-        assert_eq!(c.min().axis(2).compute(), vec![101, 404, -909, 111]);
+        assert_eq!(arr.min().axis(2).compute(), vec![101, 404, -909, 111]);
     }
 
     #[test]
     fn min_f64_3d() {
-        let c = arr![
+        let arr = arr![
             [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
             [[7.7, 8.8, 9.9], [10.0, 11.1, 12.2]]
         ];
-        assert_eq!(c.min().compute(), vec![1.1]);
+        assert_eq!(arr.min().compute(), vec![1.1]);
         assert_eq!(
-            c.min().axis(0).compute(),
+            arr.min().axis(0).compute(),
             vec![1.1, 2.2, 3.3, 4.4, 5.5, 6.6]
         );
         assert_eq!(
-            c.min().axis(1).compute(),
+            arr.min().axis(1).compute(),
             vec![1.1, 2.2, 3.3, 7.7, 8.8, 9.9]
         );
-        assert_eq!(c.min().axis(2).compute(), vec![1.1, 4.4, 7.7, 10.0]);
+        assert_eq!(arr.min().axis(2).compute(), vec![1.1, 4.4, 7.7, 10.0]);
+    }
+
+    #[test]
+    fn zeros_macro_i64_1d() {
+        let arr = zeros!(i64, 4);
+        let ix = Ix::<1>::new([4]);
+        let shape = Shape::new(ix);
+
+        assert_eq!(arr.shape().raw_dim().size(), 4);
+        assert_eq!(arr.shape().raw_dim().ndim(), 1);
+        assert_eq!(format!("{:?}", arr.shape()), format!("{:?}", shape));
+        assert_eq!(arr.dtype(), "int64");
+        assert_eq!(arr.data(), &vec![0i64; 4]);
+    }
+
+    #[test]
+    fn zeros_macro_i64_2d() {
+        let arr = zeros!(i64, 3, 2);
+        let ix = Ix::<2>::new([3, 2]);
+        let shape = Shape::new(ix);
+
+        assert_eq!(arr.shape().raw_dim().size(), 6);
+        assert_eq!(arr.shape().raw_dim().ndim(), 2);
+        assert_eq!(format!("{:?}", arr.shape()), format!("{:?}", shape));
+        assert_eq!(arr.dtype(), "int64");
+        assert_eq!(arr.data(), &vec![0i64; 6]);
+    }
+
+    #[test]
+    fn zeros_macro_i64_3d() {
+        let arr = zeros!(i64, 2, 2, 3);
+        let ix = Ix::<3>::new([2, 2, 3]);
+        let shape = Shape::new(ix);
+
+        assert_eq!(arr.shape().raw_dim().size(), 12);
+        assert_eq!(arr.shape().raw_dim().ndim(), 3);
+        assert_eq!(format!("{:?}", arr.shape()), format!("{:?}", shape));
+        assert_eq!(arr.dtype(), "int64");
+        assert_eq!(arr.data(), &vec![0i64; 12]);
+    }
+
+    #[test]
+    fn zeros_macro_f64_1d() {
+        let arr = zeros!(f64, 4);
+        let ix = Ix::<1>::new([4]);
+        let shape = Shape::new(ix);
+
+        assert_eq!(arr.shape().raw_dim().size(), 4);
+        assert_eq!(arr.shape().raw_dim().ndim(), 1);
+        assert_eq!(format!("{:?}", arr.shape()), format!("{:?}", shape));
+        assert_eq!(arr.dtype(), "float64");
+        assert_eq!(arr.data(), &vec![0.0f64; 4]);
+    }
+
+    #[test]
+    fn zeros_macro_f64_2d() {
+        let arr = zeros!(f64, 3, 2);
+        let ix = Ix::<2>::new([3, 2]);
+        let shape = Shape::new(ix);
+
+        assert_eq!(arr.shape().raw_dim().size(), 6);
+        assert_eq!(arr.shape().raw_dim().ndim(), 2);
+        assert_eq!(format!("{:?}", arr.shape()), format!("{:?}", shape));
+        assert_eq!(arr.dtype(), "float64");
+        assert_eq!(arr.data(), &vec![0.0f64; 6]);
+    }
+
+    #[test]
+    fn zeros_macro_f64_3d() {
+        let arr = zeros!(f64, 2, 2, 3);
+        let ix = Ix::<3>::new([2, 2, 3]);
+        let shape = Shape::new(ix);
+
+        assert_eq!(arr.shape().raw_dim().size(), 12);
+        assert_eq!(arr.shape().raw_dim().ndim(), 3);
+        assert_eq!(format!("{:?}", arr.shape()), format!("{:?}", shape));
+        assert_eq!(arr.dtype(), "float64");
+        assert_eq!(arr.data(), &vec![0.0f64; 12]);
+    }
+
+    #[test]
+    fn zeros_method_i64_1d() {
+        let mut arr = arr![1, 2, 3, 4];
+        let original_shape = format!("{:?}", arr.shape());
+
+        arr.zeros();
+
+        assert_eq!(format!("{:?}", arr.shape()), original_shape);
+        assert_eq!(arr.shape().raw_dim().size(), 4);
+        assert_eq!(arr.shape().raw_dim().ndim(), 1);
+        assert_eq!(arr.dtype(), "int64");
+        assert_eq!(arr.data(), &vec![0i64; 4]);
+    }
+
+    #[test]
+    fn zeros_method_i64_2d() {
+        let mut arr = arr![[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+        let original_shape = format!("{:?}", arr.shape());
+
+        arr.zeros();
+
+        assert_eq!(format!("{:?}", arr.shape()), original_shape);
+        assert_eq!(arr.shape().raw_dim().size(), 9);
+        assert_eq!(arr.shape().raw_dim().ndim(), 2);
+        assert_eq!(arr.dtype(), "int64");
+        assert_eq!(arr.data(), &vec![0i64; 9]);
+    }
+
+    #[test]
+    fn zeros_method_i64_3d() {
+        let mut arr = arr![[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]];
+        let original_shape = format!("{:?}", arr.shape());
+
+        arr.zeros();
+
+        assert_eq!(format!("{:?}", arr.shape()), original_shape);
+        assert_eq!(arr.shape().raw_dim().size(), 12);
+        assert_eq!(arr.shape().raw_dim().ndim(), 3);
+        assert_eq!(arr.dtype(), "int64");
+        assert_eq!(arr.data(), &vec![0i64; 12]);
+    }
+
+    #[test]
+    fn zeros_method_f64_1d() {
+        let mut arr = arr![1.1, 2.2, 3.3, 4.4];
+        let original_shape = format!("{:?}", arr.shape());
+
+        arr.zeros();
+
+        assert_eq!(format!("{:?}", arr.shape()), original_shape);
+        assert_eq!(arr.shape().raw_dim().size(), 4);
+        assert_eq!(arr.shape().raw_dim().ndim(), 1);
+        assert_eq!(arr.dtype(), "float64");
+        assert_eq!(arr.data(), &vec![0.0f64; 4]);
+    }
+
+    #[test]
+    fn zeros_method_f64_2d() {
+        let mut arr = arr![[TAU, -PI, 1.61], [E, 0.98, -7.42], [4.67, -0.45, 8.88]];
+        let original_shape = format!("{:?}", arr.shape());
+
+        arr.zeros();
+
+        assert_eq!(format!("{:?}", arr.shape()), original_shape);
+        assert_eq!(arr.shape().raw_dim().size(), 9);
+        assert_eq!(arr.shape().raw_dim().ndim(), 2);
+        assert_eq!(arr.dtype(), "float64");
+        assert_eq!(arr.data(), &vec![0.0f64; 9]);
+    }
+
+    #[test]
+    fn zeros_method_f64_3d() {
+        let mut arr = arr![
+            [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
+            [[7.7, 8.8, 9.9], [10.0, 11.1, 12.2]]
+        ];
+        let original_shape = format!("{:?}", arr.shape());
+
+        arr.zeros();
+
+        assert_eq!(format!("{:?}", arr.shape()), original_shape);
+        assert_eq!(arr.shape().raw_dim().size(), 12);
+        assert_eq!(arr.shape().raw_dim().ndim(), 3);
+        assert_eq!(arr.dtype(), "float64");
+        assert_eq!(arr.data(), &vec![0.0f64; 12]);
     }
 }
