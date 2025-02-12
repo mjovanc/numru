@@ -17,6 +17,7 @@ maintenance = { status = "actively-developed" }
 
 [dependencies]
 thiserror = "2"
+num-traits = "0.2"
 
 [[example]]
 name = "array"
