@@ -19,6 +19,13 @@ maintenance = { status = "actively-developed" }
 thiserror = "2"
 num-traits = "0.2"
 
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "max_benchmarks"
+harness = false
+
 [[example]]
 name = "array"
 path = "examples/array.rs"

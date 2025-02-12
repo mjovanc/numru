@@ -122,6 +122,15 @@ These utility features help with visualization, debugging, array exploration and
 | Shape Inspection | Introspection     | `a.shape()`                               | Get the shape of the array                      |
 | Data Type Check  | Introspection     | `a.dtype()`                            | Retrieve the data type of the array             |
 
+## Performance Comparison
+
+Numru is designed to be a high-performance scientific computation library. We will compare the performance of Numru with NumPy, a popular numerical computation library in Python.
+
+| **Operation**   | **NumPy** |  **Numru**|
+|----------------|----------------|----------------|
+| Min  | 🚧 Benchmarking in progress | 🚧 Benchmarking in progress |
+| Max  | 🚧 Benchmarking in progress | 🚧 Benchmarking in progress |
+
 ## License
 
 The MIT License.
