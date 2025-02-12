@@ -14,7 +14,7 @@ It is inspired by NumPy, a popular numerical computation library in Python. Numr
 ## Get Started
 
 This getting started guide might change and should not be a source of absolute truth.
-Check the unit tests if you want to stay up to date with how things should be done. Some APIs will definetely be changed in the future.
+Check the unit tests and in `examples` if you want to stay up to date with how things should be done. Some APIs will most likely be changed in the future.
 
 ```toml
 [dependencies]
@@ -90,7 +90,7 @@ Numru will offer a variety of different numerical operations and data types. It 
 - bool
 - String, &str
 
-### Supported Operations (planned)
+### Supported Operations
 
 Note that currently we only show the numru equivalents as the ones that are planned. They do not exist yet.
 
@@ -101,7 +101,7 @@ Note that currently we only show the numru equivalents as the ones that are plan
 | Ones Array     | Array Creation    | `np.ones((3,3))`            | 🚧                           |
 | Arange         | Array Creation    | `np.arange(start, stop, step)` | 🚧                       |
 | Linspace       | Array Creation    | `np.linspace(start, stop, num)` | 🚧                      |
-| Mean          | Reduction         | `np.mean(a)`                | `a.mean().compute()`        |
+| Mean          | Reduction         | `np.mean(a)`                | 🚧        |
 | Min           | Reduction         | `np.min(a)`                 | `a.min().compute()`         |
 | Max           | Reduction         | `np.max(a)`                 | `a.max().compute()`         |
 | Dot Product    | Linear Algebra    | `np.dot(a, b)`              | 🚧                           |
