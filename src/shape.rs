@@ -44,7 +44,7 @@ where
 {
     /// Formats the `Shape` for debugging purposes.
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "Shape={:?}", self.dims)
+        write!(f, "{:?}", self.dims)
     }
 }
 
