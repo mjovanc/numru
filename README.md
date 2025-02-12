@@ -94,28 +94,33 @@ Numru will offer a variety of different numerical operations and data types. It 
 
 Note that currently we only show the numru equivalents as the ones that are planned. They do not exist yet.
 
-| Operation            | NumPy Equivalent                     | Numru Equivalent             |
-|----------------------|-------------------------------------|---------------------------------|
-| Create Array         | `np.array([1, 2, 3])` | `arr![1, 2, 3]` |
-| Zeros Array         | `np.zeros((3, 3, 3))`                  | `zeros!(f64, 6)` or `a.zeros()`            |
-| Ones Array          | `np.ones((3, 3, 3))`                   | 🚧             |
-| Arange             | `np.arange(start, stop, step)`      | 🚧 |
-| Linspace           | `np.linspace(start, stop, num)`     | 🚧 |
-| Mean               | `np.mean(a)`                        | `a.mean().compute()`                 |
-| Min                | `np.min(a)`                         | `a.min().compute()`                   |
-| Max                | `np.max(a)`                         | `a.max().compute()`                   |
-| Exp                | `np.exp(a)`                         | 🚧                   |
-| Log                | `np.log(a)`                         | 🚧                   |
-| Sigmoid            | `1 / (1 + np.exp(-a))`              | 🚧               |
-| Dot Product        | `np.dot(a, b)`                      | 🚧                |
-| Reshape           | `a.reshape((4, 3, 3))`                 | 🚧            |
-| Concatenate        | `np.concatenate([a, b], axis=0)`     | 🚧 |
-| Element-wise Add   | `a + b`                             | 🚧                         |
-| Element-wise Sub   | `a - b`                             | 🚧                        |
-| Element-wise Mul   | `a * b`                             | 🚧                         |
-| Element-wise Div   | `a / b`                             | 🚧                        |
-| Fancy Indexing     | `np.ones((3, 3, 3))[0, :]`             | 🚧         |
-| Fancy Flipping     | `np.array([1, 2, 3])[::-1]`          | 🚧      |
+| **Operation**          | **Type**              | **NumPy Equivalent**             | **Numru Equivalent**             |
+|--------------------|-------------------|-----------------------------|------------------------------|
+| Create Array   | Array Creation    | `np.array([1, 2, 3])`       | `arr![1, 2, 3]`             |
+| Zeros Array    | Array Creation    | `np.zeros((3,3))`           | `zeros!(f64, 3, 3)`         |
+| Ones Array     | Array Creation    | `np.ones((3,3))`            | 🚧                           |
+| Arange         | Array Creation    | `np.arange(start, stop, step)` | 🚧                       |
+| Linspace       | Array Creation    | `np.linspace(start, stop, num)` | 🚧                      |
+| Mean          | Reduction         | `np.mean(a)`                | `a.mean().compute()`        |
+| Min           | Reduction         | `np.min(a)`                 | `a.min().compute()`         |
+| Max           | Reduction         | `np.max(a)`                 | `a.max().compute()`         |
+| Dot Product    | Linear Algebra    | `np.dot(a, b)`              | 🚧                           |
+| Reshape        | Manipulation      | `a.reshape((4, 3, 3))`      | 🚧                           |
+| Concatenate    | Manipulation      | `np.concatenate([a, b], axis=0)` | 🚧                   |
+| Element-wise Add | Element-wise Ops | `a + b`                     | 🚧                           |
+| Element-wise Sub | Element-wise Ops | `a - b`                     | 🚧                           |
+| Element-wise Mul | Element-wise Ops | `a * b`                     | 🚧                           |
+| Element-wise Div | Element-wise Ops | `a / b`                     | 🚧                           |
+
+### Utility Features
+
+These utility features help with visualization, debugging, array exploration and more.
+
+| **Feature**              | **Type**               | **Numru**                                      | **Description**                                      |
+|----------------------|-------------------|--------------------------------------------|--------------------------------------------------|
+| Visualization    | Display & Debug   | `a.visualize().execute()`                 | Print an array in a human-readable format       |
+| Shape Inspection | Introspection     | `a.shape()`                               | Get the shape of the array                      |
+| Data Type Check  | Introspection     | `a.dtype()`                            | Retrieve the data type of the array             |
 
 ## License
 
