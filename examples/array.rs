@@ -21,7 +21,7 @@ fn main() {
     // Initialize arrays by passing vectors to the `arr!` macro
     let d = arr!(vec![42, -17, 256, 3, 99, -8]);
     println!("\nd.shape() = {:?}", d.shape());
-    // d.visualize().execute();
+    d.visualize().execute();
 
     let e = arr!(vec![
         vec![TAU, -PI, 1.61],
@@ -29,12 +29,12 @@ fn main() {
         vec![4.67, -0.45, 8.88]
     ]);
     println!("\ne.shape() = {:?}", e.shape());
-    // e.visualize().decimal_points(1).execute();
+    e.visualize().decimal_points(1).execute();
 
     let f = arr!(vec![
         vec![vec![101, 202, 303], vec![404, 505, 606]],
         vec![vec![-707, -808, -909], vec![111, 222, 333]]
     ]);
     println!("\nf.shape() = {:?}", f.shape());
-    // f.visualize().execute();
+    f.visualize().execute();
 }
