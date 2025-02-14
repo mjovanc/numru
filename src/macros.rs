@@ -3,6 +3,70 @@
 /// the number of rows, columns, and further dimensions as needed.
 #[macro_export]
 macro_rules! arr {
+    (vec![ $(vec![ $(vec![$($elems:expr),+ $(,)?] ),+ $(,)?]),+ $(,)?]) => {{
+        fn flatten_3d<T: Clone>(nested: &[Vec<Vec<T>>]) -> Vec<T> {
+            nested.iter().flat_map(|inner| inner.iter().flat_map(|v| v.clone())).collect()
+        }
+
+        fn get_shape_3d<T>(nested: &[Vec<Vec<T>>]) -> Vec<usize> {
+            let mut shape = vec![nested.len()];
+            if let Some(first) = nested.first() {
+                shape.push(first.len());
+                if let Some(second) = first.first() {
+                    if !second.is_empty() {
+                        shape.push(second.len());
+                    } else {
+                        shape.push(0);
+                    }
+                } else {
+                    shape.push(0);
+                }
+            } else {
+                shape.push(0);
+                shape.push(0);
+            }
+            shape
+        }
+
+        let temp_3d = vec![$(vec![$(vec![$($elems),+]),+]),+];
+        let data = flatten_3d(&temp_3d);
+        let shape = get_shape_3d(&temp_3d);
+
+        $crate::Array::new(data, $crate::Shape::new($crate::ix::Ix::<3>::new(shape.try_into().unwrap()))).unwrap()
+    }};
+
+    (vec![ $(vec![$($elems:expr),+ $(,)?]),+ $(,)?]) => {{
+        fn flatten_2d<T: Clone>(nested: &[Vec<T>]) -> Vec<T> {
+            nested.iter().flat_map(|inner| inner.clone()).collect()
+        }
+
+        fn get_shape_2d<T>(nested: &[Vec<T>]) -> Vec<usize> {
+            let mut shape = vec![nested.len()];
+            if let Some(first) = nested.first() {
+                if !first.is_empty() {
+                    shape.push(first.len());
+                } else {
+                    shape.push(0);
+                }
+            } else {
+                shape.push(0);
+            }
+            shape
+        }
+
+        let temp_2d = vec![$(vec![$($elems),+]),+];
+        let data = flatten_2d(&temp_2d);
+        let shape = get_shape_2d(&temp_2d);
+
+        $crate::Array::new(data, $crate::Shape::new($crate::ix::Ix::<2>::new(shape.try_into().unwrap()))).unwrap()
+    }};
+
+    (vec![$($elem:expr),+ $(,)?]) => {{
+        let data = vec![$($elem),+];
+        let shape = vec![data.len()];
+        $crate::Array::new(data, $crate::Shape::new($crate::ix::Ix::<1>::new(shape.try_into().unwrap()))).unwrap()
+    }};
+
     ($([$([$($elems:expr),+]),+]),+ $(,)?) => {{
         fn flatten_3d<T: Clone>(nested: &[Vec<Vec<T>>]) -> Vec<T> {
             nested.iter().flat_map(|inner| inner.iter().flat_map(|v| v.clone())).collect()
