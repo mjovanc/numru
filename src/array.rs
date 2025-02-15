@@ -290,6 +290,113 @@ where
             ))),
         }
     }
+
+    /// Computes the mean value(s) of the array along a specified axis or for the whole array.
+    pub fn mean_compute(&self, axis: Option<usize>) -> Result<Vec<f64>, ArrayError>
+    where
+        T: Into<f64>
+    {
+        if self.data.is_empty() {
+            return Err(ArrayError::EmptyArray);
+        }
+
+        let raw_dim = self.shape.raw_dim();
+        let ndim = raw_dim.ndim();
+
+        if let Some(axis) = axis {
+            if axis >= ndim {
+                return Err(ArrayError::InvalidAxis(format!(
+                    "Axis {} is out of bounds for array with {} dimensions",
+                    axis, ndim
+                )));
+            }
+        }
+
+        match ndim {
+            1 => {
+                let sum: f64 = self.data.iter().map(|&x| Into::<f64>::into(x)).sum();
+                Ok(vec![sum / self.data.len() as f64])
+            }
+            2 => {
+                let rows = raw_dim.dims()[0];
+                let cols = raw_dim.dims()[1];
+
+                if let Some(axis) = axis {
+                    if axis == 0 {
+                        (0..cols)
+                            .map(|col| {
+                                let sum: f64 = (0..rows)
+                                    .map(|row| Into::<f64>::into(self.data[row * cols + col]))
+                                    .sum();
+                                Ok(sum / rows as f64)
+                            })
+                            .collect()
+                    } else {
+                        (0..rows)
+                            .map(|row| {
+                                let sum: f64 = self.data[row * cols..(row + 1) * cols]
+                                    .iter()
+                                    .map(|&x| Into::<f64>::into(x))
+                                    .sum();
+                                Ok(sum / cols as f64)
+                            })
+                            .collect()
+                    }
+                } else {
+                    let sum: f64 = self.data.iter().map(|&x| Into::<f64>::into(x)).sum();
+                    Ok(vec![sum / (rows * cols) as f64])
+                }
+            }
+            3 => {
+                let depth = raw_dim.dims()[0];
+                let rows = raw_dim.dims()[1];
+                let cols = raw_dim.dims()[2];
+
+                if let Some(axis) = axis {
+                    match axis {
+                        0 => (0..rows * cols)
+                            .map(|i| {
+                                let sum: f64 = (0..depth)
+                                    .map(|d| Into::<f64>::into(self.data[d * rows * cols + i]))
+                                    .sum();
+                                Ok(sum / depth as f64)
+                            })
+                            .collect(),
+                        1 => (0..depth)
+                            .flat_map(|d| {
+                                (0..cols).map(move |c| {
+                                    let sum: f64 = (0..rows)
+                                        .map(|r| Into::<f64>::into(self.data[d * rows * cols + r * cols + c]))
+                                        .sum();
+                                    Ok(sum / rows as f64)
+                                })
+                            })
+                            .collect(),
+                        2 => (0..depth)
+                            .flat_map(|d| {
+                                (0..rows).map(move |r| {
+                                    let row_start = d * rows * cols + r * cols;
+                                    let sum: f64 = self.data[row_start..row_start + cols]
+                                        .iter()
+                                        .map(|&x| Into::<f64>::into(x))
+                                        .sum();
+                                    Ok(sum / cols as f64)
+                                })
+                            })
+                            .collect(),
+                        _ => unreachable!(),
+                    }
+                } else {
+                    let sum: f64 = self.data.iter().map(|&x| Into::<f64>::into(x)).sum();
+                    Ok(vec![sum / (depth * rows * cols) as f64])
+                }
+            }
+            _ => Err(ArrayError::UnimplementedDimension(format!(
+                "Dimension {} for mean computation not implemented",
+                ndim
+            ))),
+        }
+    }
 }
 
 #[cfg(test)]
