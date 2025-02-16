@@ -405,6 +405,17 @@ mod tests {
 
     use crate::{Dimension, Ix, Shape};
 
+    fn round_to_3dp(value: f64) -> f64 {
+        (value * 1000.0).round() / 1000.0
+    }
+
+    fn assert_vec_approx_eq(actual: Vec<f64>, expected: Vec<f64>) {
+        assert_eq!(actual.len(), expected.len(), "Vectors have different lengths");
+        for (a, e) in actual.iter().zip(expected.iter()) {
+            assert_eq!(round_to_3dp(*a), round_to_3dp(*e), "Values differ: {} != {}", a, e);
+        }
+    }
+
     #[test]
     fn array_creation_i64_1d() {
         let arr = arr![1, 2, 3, 4];
@@ -932,5 +943,73 @@ mod tests {
         assert_eq!(arr.shape().raw_dim().ndim(), 3);
         assert_eq!(arr.dtype(), "float64");
         assert_eq!(arr.data(), &vec![1.0f64; 12]);
+    }
+
+    #[test]
+    fn mean_i64_1d() {
+        let arr = arr![42, -17, 256, 3, 99, -8];
+        let expected_mean = vec![62.5];
+        assert_vec_approx_eq(arr.mean().compute(), expected_mean);
+    }
+
+    #[test]
+    fn mean_f64_1d() {
+        let arr = arr![PI, 2.71, -1.0, 42.0, 0.98];
+        let expected_mean = vec![9.566];
+        assert_vec_approx_eq(arr.mean().compute(), expected_mean);
+    }
+
+    #[test]
+    fn mean_i64_2d() {
+        let arr = arr![[1, 5, 3], [4, 2, 6], [0, 9, 8]];
+        let expected_mean = vec![4.222];
+        let expected_mean_axis_0 = vec![1.667, 5.333, 5.667];
+        let expected_mean_axis_1 = vec![3.0, 4.0, 5.667];
+        assert_vec_approx_eq(arr.mean().compute(), expected_mean);
+        assert_vec_approx_eq(arr.mean().axis(0).compute(), expected_mean_axis_0);
+        assert_vec_approx_eq(arr.mean().axis(1).compute(), expected_mean_axis_1);
+    }
+
+    #[test]
+    fn mean_f64_2d() {
+        let arr = arr![[PI, -2.71, 1.61], [E, 0.98, -7.42], [4.67, -0.45, 8.88]];
+        let expected_mean = vec![1.269];
+        let expected_mean_axis_0 = vec![3.51, -0.727, 1.023];
+        let expected_mean_axis_1 = vec![0.681, -1.241, 4.367];
+        assert_vec_approx_eq(arr.mean().compute(), expected_mean);
+        assert_vec_approx_eq(arr.mean().axis(0).compute(), expected_mean_axis_0);
+        assert_vec_approx_eq(arr.mean().axis(1).compute(), expected_mean_axis_1);
+    }
+
+    #[test]
+    fn mean_i64_3d() {
+        let arr = arr![
+            [[101, 202, 303], [404, 505, 606]],
+            [[-707, -808, -909], [111, 222, 333]]
+        ];
+        let expected_mean = vec![30.25];
+        let expected_mean_axis_0 = vec![-303.0, -303.0, -303.0, 257.5, 363.5, 469.5];
+        let expected_mean_axis_1 = vec![252.5, 353.5, 454.5, -298.0, -293.0, -288.0];
+        let expected_mean_axis_2 = vec![202.0, 505.0, -808.0, 222.0];
+        assert_vec_approx_eq(arr.mean().compute(), expected_mean);
+        assert_vec_approx_eq(arr.mean().axis(0).compute(), expected_mean_axis_0);
+        assert_vec_approx_eq(arr.mean().axis(1).compute(), expected_mean_axis_1);
+        assert_vec_approx_eq(arr.mean().axis(2).compute(), expected_mean_axis_2);
+    }
+
+    #[test]
+    fn mean_f64_3d() {
+        let arr = arr![
+            [[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]],
+            [[7.7, 8.8, 9.9], [10.0, 11.1, 12.2]]
+        ];
+        let expected_mean = vec![6.9];
+        let expected_mean_axis_0 = vec![4.4, 5.5, 6.6, 7.2, 8.3, 9.4];
+        let expected_mean_axis_1 = vec![2.75, 3.85, 4.95, 8.85, 9.95, 11.05];
+        let expected_mean_axis_2 = vec![2.2, 5.5, 8.8, 11.1];
+        assert_vec_approx_eq(arr.mean().compute(), expected_mean);
+        assert_vec_approx_eq(arr.mean().axis(0).compute(), expected_mean_axis_0);
+        assert_vec_approx_eq(arr.mean().axis(1).compute(), expected_mean_axis_1);
+        assert_vec_approx_eq(arr.mean().axis(2).compute(), expected_mean_axis_2);
     }
 }
