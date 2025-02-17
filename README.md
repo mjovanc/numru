@@ -101,7 +101,7 @@ Note that currently we only show the numru equivalents as the ones that are plan
 | Ones Array     | Array Creation    | `np.ones((3,3))`            | `ones!(i64, 3, 3)`                           |
 | Arange         | Array Creation    | `np.arange(start, stop, step)` | 🚧                       |
 | Linspace       | Array Creation    | `np.linspace(start, stop, num)` | 🚧                      |
-| Mean          | Reduction         | `np.mean(a)`                | 🚧        |
+| Mean          | Reduction         | `np.mean(a)`                | `a.mean().compute()`        |
 | Min           | Reduction         | `np.min(a)`                 | `a.min().compute()`         |
 | Max           | Reduction         | `np.max(a)`                 | `a.max().compute()`         |
 | Dot Product    | Linear Algebra    | `np.dot(a, b)`              | 🚧                           |
