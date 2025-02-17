@@ -4,12 +4,12 @@
 ![crates.io](https://img.shields.io/crates/v/numru.svg)
 [![documentation](https://img.shields.io/badge/docs-numru-blue?logo=rust)](https://docs.rs/numru/latest/)
 
-A high-performance scientific computation library written in Rust.
+A high-performance numeric computation library written in Rust.
 
 ## Motivation
 
-Numru is a scientific computation library that aims to provide a high-performance, easy-to-use, and flexible API for numerical operations.
-It is inspired by NumPy, a popular numerical computation library in Python. Numru is designed to be a fundamental library for scientific computing with Rust.
+Numru is a numeric computation library that aims to provide a high-performance, easy-to-use, and flexible API for numerical operations.
+It is inspired by NumPy, a popular numerical computation library in Python. Numru is designed to be a fundamental library for numeric computing with Rust.
 
 ## Get Started
 
@@ -75,7 +75,7 @@ c.shape() = Ix { dims: [2, 2, 3] }
 
 ## Features
 
-Numru will offer a variety of different numerical operations and data types. It is intended to be a fundamental library for scientific computing with Rust.
+Numru will offer a variety of different numerical operations and data types. It is intended to be a fundamental library for numeric computing with Rust.
 
 ### Supported Data Types
 
